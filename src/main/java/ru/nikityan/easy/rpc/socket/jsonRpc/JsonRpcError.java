@@ -1,4 +1,4 @@
-package ru.nikityan.easy.rpc.socket.support;
+package ru.nikityan.easy.rpc.socket.jsonRpc;
 
 import org.jetbrains.annotations.NotNull;
 

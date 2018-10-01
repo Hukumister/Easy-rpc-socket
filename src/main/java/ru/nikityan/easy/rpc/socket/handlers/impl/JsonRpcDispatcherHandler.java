@@ -11,7 +11,7 @@ import ru.nikityan.easy.rpc.socket.exceptions.JsonRequestException;
 import ru.nikityan.easy.rpc.socket.handlers.DispatcherHandler;
 import ru.nikityan.easy.rpc.socket.handlers.JsonRequestHandler;
 import ru.nikityan.easy.rpc.socket.handlers.LifeCircleWebSocket;
-import ru.nikityan.easy.rpc.socket.support.JsonRpcError;
+import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcError;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcRequest;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcResponse;
 import ru.nikityan.easy.rpc.socket.utils.JsonConvert;

@@ -2,6 +2,7 @@ package ru.nikityan.easy.rpc.socket.support;
 
 import org.junit.Test;
 import ru.nikityan.easy.rpc.socket.Message;
+import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcError;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcNotification;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcRequest;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcResponse;

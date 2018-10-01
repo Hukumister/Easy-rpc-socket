@@ -7,7 +7,7 @@ import ru.nikityan.easy.rpc.socket.Message;
 import ru.nikityan.easy.rpc.socket.MessageHeaders;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcRequest;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcResponse;
-import ru.nikityan.easy.rpc.socket.support.JsonRpcError;
+import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcError;
 import ru.nikityan.easy.rpc.socket.support.ListMapTypeAdapter;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 import ru.nikityan.easy.rpc.socket.support.RequestMessage;

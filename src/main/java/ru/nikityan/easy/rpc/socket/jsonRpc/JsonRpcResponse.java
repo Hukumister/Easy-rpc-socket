@@ -1,8 +1,6 @@
 package ru.nikityan.easy.rpc.socket.jsonRpc;
 
 
-import ru.nikityan.easy.rpc.socket.support.JsonRpcError;
-
 public class JsonRpcResponse {
     /**
      * Identificator of message

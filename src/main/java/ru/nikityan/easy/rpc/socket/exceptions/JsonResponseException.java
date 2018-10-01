@@ -1,7 +1,7 @@
 package ru.nikityan.easy.rpc.socket.exceptions;
 
 
-import ru.nikityan.easy.rpc.socket.support.JsonRpcError;
+import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcError;
 
 /**
  * Exception used in jsonrpc protocol.
