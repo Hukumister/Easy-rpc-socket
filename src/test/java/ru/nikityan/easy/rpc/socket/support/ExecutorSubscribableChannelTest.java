@@ -25,9 +25,6 @@ import static org.mockito.Mockito.*;
  */
 public class ExecutorSubscribableChannelTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private ExecutorSubscribableChannel channel = new ExecutorSubscribableChannel();
 
     @Mock

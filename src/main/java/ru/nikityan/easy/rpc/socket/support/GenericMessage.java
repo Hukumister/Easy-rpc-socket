@@ -35,15 +35,14 @@ public class GenericMessage<T> implements Message<T> {
         if (o == null || getClass() != o.getClass()) return false;
 
         GenericMessage<?> that = (GenericMessage<?>) o;
-
         return (payload != null ? payload.equals(that.payload) : that.payload == null)
-                && (messageHeaders != null ? messageHeaders.equals(that.messageHeaders) : that.messageHeaders == null);
+                && messageHeaders.equals(that.messageHeaders);
     }
 
     @Override
     public int hashCode() {
         int result = payload != null ? payload.hashCode() : 0;
-        result = 31 * result + (messageHeaders != null ? messageHeaders.hashCode() : 0);
+        result = 31 * result + messageHeaders.hashCode();
         return result;
     }
 

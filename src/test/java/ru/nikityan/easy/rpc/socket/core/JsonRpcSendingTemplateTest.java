@@ -41,9 +41,6 @@ public class JsonRpcSendingTemplateTest {
     @InjectMocks
     private JsonRpcSendingTemplate sendingTemplate;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);

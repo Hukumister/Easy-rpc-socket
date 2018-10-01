@@ -23,8 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by Nikit on 29.09.2018.
@@ -48,6 +50,8 @@ public class JsonRpcAnnotationMessageHandlerTest {
         messageHandler = new TestJsonRpcAnnotationMessageHandler(subscribeMessageChanel, messageChannel);
         messageHandler.setApplicationContext(new StaticApplicationContext());
         messageHandler.afterPropertiesSet();
+
+        when(messageChannel.send(any())).thenReturn(true);
 
         testController = new TestController();
     }
