@@ -6,6 +6,9 @@ import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcNotification;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcRequest;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcResponse;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -43,7 +46,10 @@ public class MessageBuilderTest {
                 .build();
 
         Message fromMessage = MessageBuilder.fromMessage(message).build();
-        assertEquals(fromMessage, message);
+        JsonRpcNotification from = (JsonRpcNotification) fromMessage.getPayload();
+        JsonRpcNotification to = (JsonRpcNotification) message.getPayload();
+
+        assertEquals(from.getParams(), to.getParams());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -64,11 +70,13 @@ public class MessageBuilderTest {
     }
 
     @Test
-    public void buildResponseMessage() throws Exception {
-        JsonRpcResponse rpcResponse = new JsonRpcResponse(2L, 45);
-        Message<JsonRpcResponse> build = MessageBuilder
-                .fromPayload(rpcResponse)
-                .build();
+    public void fromMessageWithHeaders() throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        map.put("foo", "bar");
 
+        Message<String> build = MessageBuilder.fromPayload("message").build();
+        Message<String> message = MessageBuilder.fromMessage(build).withHeaders(map).build();
+
+        assertEquals(message.getMessageHeader().get("foo"), "bar");
     }
 }

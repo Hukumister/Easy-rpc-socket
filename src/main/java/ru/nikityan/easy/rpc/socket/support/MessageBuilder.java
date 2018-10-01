@@ -21,20 +21,15 @@ public final class MessageBuilder<T> {
     private final T payload;
 
     @Nullable
-    private final Message<T> originalMessage;
-
-    @Nullable
     private Map<String, Object> headers;
 
     private MessageBuilder(T payload) {
         this.payload = payload;
-        this.originalMessage = null;
     }
 
     private MessageBuilder(@Nullable Message<T> originalMessage) {
         Assert.notNull(originalMessage, "Message must not be null");
         this.payload = originalMessage.getPayload();
-        this.originalMessage = originalMessage;
     }
 
     @NotNull
@@ -55,9 +50,6 @@ public final class MessageBuilder<T> {
     @SuppressWarnings("unchecked")
     public Message<T> build() {
         Assert.notNull(payload, "Payload must not be null");
-        if (originalMessage != null) {
-            return originalMessage;
-        }
         if (payload instanceof JsonRpcResponse) {
             JsonRpcResponse response = (JsonRpcResponse) this.payload;
             MessageHeaders messageHeaders = new MessageHeaders(headers, MessageType.RESPONCE, response.getId());
