@@ -21,7 +21,7 @@ public class MessageHeaderAccessorTest {
 
         GenericMessage<String> message = new GenericMessage<>("payload", map);
 
-        MessageHeaderAccessor accessor = MessageHeaderAccessor.createAccessor(message);
+        MessageHeaderAccessor accessor = MessageHeaderAccessor.ofMessage(message);
         MessageHeaders actual = accessor.getMessageHeaders();
 
         assertEquals(3, actual.size());
@@ -36,7 +36,7 @@ public class MessageHeaderAccessorTest {
         map.put("bar", "baz");
 
         GenericMessage<String> message = new GenericMessage<>("payload", map);
-        MessageHeaderAccessor accessor = MessageHeaderAccessor.createAccessor(message);
+        MessageHeaderAccessor accessor = MessageHeaderAccessor.ofMessage(message);
 
         accessor.setMessageMethod("subcribe");
         MessageHeaders messageHeaders = accessor.getMessageHeaders();
@@ -51,7 +51,7 @@ public class MessageHeaderAccessorTest {
         map.put("bar", "baz");
 
         GenericMessage<String> message = new GenericMessage<>("payload", map);
-        MessageHeaderAccessor accessor = MessageHeaderAccessor.createAccessor(message);
+        MessageHeaderAccessor accessor = MessageHeaderAccessor.ofMessage(message);
 
         accessor.setMessageMethod("subcribe");
         accessor.setImmutable();
