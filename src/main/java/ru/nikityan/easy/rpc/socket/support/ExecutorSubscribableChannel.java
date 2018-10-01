@@ -34,7 +34,7 @@ public class ExecutorSubscribableChannel extends AbstractSubscribeChannel {
         return true;
     }
 
-    private class SendTask implements Runnable {
+    private static class SendTask implements Runnable {
 
         private final Message<?> message;
 

@@ -109,7 +109,7 @@ public class HandlerMethod {
     }
 
     public MethodParameter[] getParameters() {
-        return parameters;
+        return parameters.clone();
     }
 
     public <A extends Annotation> A getMethodAnnotation(Class<A> annotationType) {

@@ -35,7 +35,7 @@ public class SubscribeMethodReturnValueHandler implements HandlerMethodReturnVal
             throw new IllegalStateException("Method parameter id required");
         }
         MessageHeaders messageHeader = message.getMessageHeader();
-        MessageHeaderAccessor messageHeaderAccessor = MessageHeaderAccessor.createAccessor(message);
+        MessageHeaderAccessor messageHeaderAccessor = MessageHeaderAccessor.ofMessage(message);
         SubscribeMapping methodAnnotation = returnType.getMethodAnnotation(SubscribeMapping.class);
         messageHeaderAccessor.setSubscribeName(methodAnnotation.value());
         MessageHeaders messageHeaders = messageHeaderAccessor.getMessageHeaders();

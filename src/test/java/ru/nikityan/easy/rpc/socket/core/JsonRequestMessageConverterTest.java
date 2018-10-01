@@ -123,7 +123,7 @@ public class JsonRequestMessageConverterTest {
         messageConverter.fromMessage(requestMessage, int.class, "x");
     }
 
-    private class Answer {
+    private static class Answer {
         private String name;
         private long id;
 

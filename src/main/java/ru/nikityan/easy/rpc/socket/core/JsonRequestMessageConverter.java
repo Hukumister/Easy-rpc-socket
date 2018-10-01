@@ -1,6 +1,7 @@
 package ru.nikityan.easy.rpc.socket.core;
 
 import com.google.gson.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.nikityan.easy.rpc.socket.Message;
 import ru.nikityan.easy.rpc.socket.MessageHeaders;
@@ -11,6 +12,7 @@ import ru.nikityan.easy.rpc.socket.support.ListMapTypeAdapter;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 import ru.nikityan.easy.rpc.socket.support.RequestMessage;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,15 @@ public class JsonRequestMessageConverter implements SmartMessageConverter {
         GsonBuilder gsonBuilder = new GsonBuilder();
         initTypeAdapters().forEach(gsonBuilder::registerTypeAdapter);
         this.gsonConverter = gsonBuilder.create();
+    }
+
+    @NotNull
+    protected Map<Class<?>, TypeAdapter<?>> initTypeAdapters() {
+        ListMapTypeAdapter mapTypeAdapter = new ListMapTypeAdapter();
+        Map<Class<?>, TypeAdapter<?>> map = new HashMap<>();
+        map.put(List.class, mapTypeAdapter);
+        map.put(Map.class, mapTypeAdapter);
+        return Collections.unmodifiableMap(map);
     }
 
     @Override
@@ -90,13 +101,5 @@ public class JsonRequestMessageConverter implements SmartMessageConverter {
             return requestMessage.getRequest();
         }
         return null;
-    }
-
-    protected Map<Class<?>, TypeAdapter<?>> initTypeAdapters() {
-        ListMapTypeAdapter mapTypeAdapter = new ListMapTypeAdapter();
-        Map<Class<?>, TypeAdapter<?>> map = new HashMap<>();
-        map.put(List.class, mapTypeAdapter);
-        map.put(Map.class, mapTypeAdapter);
-        return map;
     }
 }

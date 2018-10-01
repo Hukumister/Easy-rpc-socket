@@ -113,7 +113,7 @@ public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler impl
 
     @Override
     protected String getDestination(Message<?> message) {
-        MessageHeaderAccessor accessor = MessageHeaderAccessor.createAccessor(message);
+        MessageHeaderAccessor accessor = MessageHeaderAccessor.ofMessage(message);
         return accessor.getMessageMethod();
     }
 

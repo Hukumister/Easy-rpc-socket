@@ -181,7 +181,7 @@ public class JsonRpcAnnotationMessageHandlerTest {
         assertEquals("exceptionHandler", testController.method);
     }
 
-    private class TestJsonRpcAnnotationMessageHandler extends JsonRpcAnnotationMessageHandler {
+    private static class TestJsonRpcAnnotationMessageHandler extends JsonRpcAnnotationMessageHandler {
 
         public TestJsonRpcAnnotationMessageHandler(@NotNull SubscribeMessageChanel inboundChannel,
                                                    @NotNull MessageChannel outboundChannel) {
@@ -194,7 +194,7 @@ public class JsonRpcAnnotationMessageHandlerTest {
     }
 
     @Controller
-    private class TestController {
+    private static class TestController {
 
         private String method;
 
