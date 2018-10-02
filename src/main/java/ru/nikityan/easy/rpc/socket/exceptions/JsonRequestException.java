@@ -1,6 +1,8 @@
 package ru.nikityan.easy.rpc.socket.exceptions;
 
-import org.springframework.http.HttpStatus;
+import org.jetbrains.annotations.Nullable;
+import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcError;
+import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcRequest;
 
 /**
  * Exception used in jsonrpc protocol.
@@ -9,22 +11,28 @@ public class JsonRequestException extends RuntimeException {
     /**
      * Code use like in HTTP code error
      */
-    private int code;
+    private final JsonRpcError rpcError;
 
-    public JsonRequestException(String message) {
-        super(message);
+    private final JsonRpcRequest originalRequest;
+
+    public JsonRequestException(JsonRpcError rpcError, JsonRpcRequest originalRequest) {
+        super();
+        this.rpcError = rpcError;
+        this.originalRequest = originalRequest;
     }
 
-    public JsonRequestException(String message, HttpStatus code) {
-        super(message);
-        this.code = code.value();
+    public JsonRequestException(Throwable cause, JsonRpcError rpcError, JsonRpcRequest originalRequest) {
+        super(cause);
+        this.rpcError = rpcError;
+        this.originalRequest = originalRequest;
     }
 
-    public JsonRequestException(String message, Throwable cause) {
-        super(message, cause);
+    public JsonRpcError getRpcError() {
+        return rpcError;
     }
 
-    public int getCode() {
-        return code;
+    @Nullable
+    public JsonRpcRequest getOriginalRequest() {
+        return originalRequest;
     }
 }
