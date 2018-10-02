@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Method {
+public @interface RequestMethod {
 
     /**
      * The name of the method for processing messages
