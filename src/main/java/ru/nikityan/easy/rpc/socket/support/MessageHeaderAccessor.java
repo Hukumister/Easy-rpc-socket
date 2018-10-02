@@ -13,9 +13,13 @@ import java.util.Map;
  */
 public class MessageHeaderAccessor {
 
+    public final static String SESSION_ID = "sessionId";
+
     public final static String SUBSCRIBE_METHOD = "subscribeMethodName";
 
     public final static String MESSAGE_METHOD = "messageMethod";
+
+    public final static String SEND_MESSAGE_METHOD = "sendMessageMethod";
 
     private final MuttableHeaders messageHeaders;
 
@@ -54,6 +58,24 @@ public class MessageHeaderAccessor {
         return null;
     }
 
+    @Nullable
+    public static String getSendMessageMethod(MessageHeaders messageHeaders) {
+        Object messageMethod = messageHeaders.get(SEND_MESSAGE_METHOD);
+        if (messageMethod != null) {
+            return (String) messageMethod;
+        }
+        return null;
+    }
+
+    @Nullable
+    public static String getSessionId(MessageHeaders messageHeaders) {
+        Object messageMethod = messageHeaders.get(SESSION_ID);
+        if (messageMethod != null) {
+            return (String) messageMethod;
+        }
+        return null;
+    }
+
     public void setMessageType(MessageType messageType) {
         this.messageHeaders.getRawHeader().put(MessageHeaders.MESSAGE_TYPE, messageType);
     }
@@ -64,6 +86,14 @@ public class MessageHeaderAccessor {
 
     public void setSubscribeName(String method) {
         this.messageHeaders.getRawHeader().put(SUBSCRIBE_METHOD, method);
+    }
+
+    public void setSendMessageMethod(String sendMessageMethod) {
+        this.messageHeaders.getRawHeader().put(SEND_MESSAGE_METHOD, sendMessageMethod);
+    }
+
+    public void setSessionId(String sessionId) {
+        this.messageHeaders.getRawHeader().put(SESSION_ID, sessionId);
     }
 
     public MessageType messageType() {
@@ -80,6 +110,16 @@ public class MessageHeaderAccessor {
         return header != null ? (String) header : null;
     }
 
+    public String getSendMessageMethod() {
+        Object header = getHeader(SEND_MESSAGE_METHOD);
+        return header != null ? (String) header : null;
+    }
+
+    public String getSessionId() {
+        Object header = getHeader(SESSION_ID);
+        return header != null ? (String) header : null;
+    }
+
     public Object getHeader(String key) {
         return this.messageHeaders.get(key);
     }
@@ -93,6 +133,9 @@ public class MessageHeaderAccessor {
     }
 
     public MessageHeaders getMessageHeaders() {
+        if (messageHeaders.muttable) {
+            messageHeaders.setImuttable();
+        }
         return this.messageHeaders;
     }
 
