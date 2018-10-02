@@ -3,7 +3,6 @@ package ru.nikityan.easy.rpc.socket.core;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import ru.nikityan.easy.rpc.socket.Message;
 import ru.nikityan.easy.rpc.socket.MessageChannel;
@@ -69,7 +68,7 @@ public class JsonRpcSendingTemplate implements MessageSendingOperations {
 
     private void doSend(Message<?> message) {
         String messageMethod = MessageHeaderAccessor.getMessageMethod(message.getMessageHeader());
-        if(StringUtils.isEmpty(messageMethod)){
+        if (StringUtils.isEmpty(messageMethod)) {
             throw new IllegalArgumentException("Message method is required");
         }
 
@@ -82,7 +81,6 @@ public class JsonRpcSendingTemplate implements MessageSendingOperations {
 
     protected void convertAndSend(String destination, Object payload, @Nullable Map<String, Object> headers,
                                   @Nullable MessagingPostProcessor postProcessor) {
-
         MessageHeaders messageHeaders = new MessageHeaders(headers, MessageType.NOTIFICATION, -1L);
         Message<?> message = doConvert(payload, messageHeaders, postProcessor);
         send(destination, message);
