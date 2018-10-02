@@ -7,7 +7,7 @@ import ru.nikityan.easy.rpc.socket.Message;
 import ru.nikityan.easy.rpc.socket.MessageHeaders;
 import ru.nikityan.easy.rpc.socket.core.MessageSendingOperations;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcResponse;
-import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Method;
+import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.RequestMethod;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 import ru.nikityan.easy.rpc.socket.support.MessageHeaderAccessor;
 
@@ -24,7 +24,7 @@ public class ResponseMethodReturnValueHandler implements HandlerMethodReturnValu
 
     @Override
     public boolean supportsReturnType(MethodParameter returnType) {
-        return returnType.hasMethodAnnotation(Method.class);
+        return returnType.hasMethodAnnotation(RequestMethod.class);
     }
 
     @Override
@@ -34,8 +34,8 @@ public class ResponseMethodReturnValueHandler implements HandlerMethodReturnValu
         Assert.notNull(returnType, "Method parameter is required");
         MessageHeaders messageHeader = message.getMessageHeader();
         MessageHeaderAccessor accessor = MessageHeaderAccessor.ofHeaders(messageHeader);
-        Method annotation = returnType.getMethodAnnotation(Method.class);
-        accessor.setSendMessageMethod(annotation.value());
+        RequestMethod annotation = returnType.getMethodAnnotation(RequestMethod.class);
+        accessor.setMessageMethod(annotation.value());
         messageHeader = accessor.getMessageHeaders();
         JsonRpcResponse rpcResponse = new JsonRpcResponse(messageHeader.getId(), returnValue);
         Message<JsonRpcResponse> responseMessage = MessageBuilder.fromPayload(rpcResponse)
