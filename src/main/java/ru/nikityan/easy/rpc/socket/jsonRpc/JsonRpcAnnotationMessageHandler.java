@@ -17,14 +17,12 @@ import ru.nikityan.easy.rpc.socket.invocation.HandlerMethodReturnValueHandler;
 import ru.nikityan.easy.rpc.socket.invocation.ResponseMethodReturnValueHandler;
 import ru.nikityan.easy.rpc.socket.invocation.SubscribeMethodReturnValueHandler;
 import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Controller;
-import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.RequestMapping;
-import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.SubscribeMapping;
+import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Method;
+import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Subscribe;
 import ru.nikityan.easy.rpc.socket.support.AbstractMessageHandler;
-import ru.nikityan.easy.rpc.socket.support.JsonRpcError;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 import ru.nikityan.easy.rpc.socket.support.MessageHeaderAccessor;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,17 +42,22 @@ public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler impl
     @NotNull
     private final MessageChannel outboundChannel;
 
+    private final JsonRpcSendingTemplate template;
+
     public JsonRpcAnnotationMessageHandler(@NotNull SubscribeMessageChanel inboundChannel,
                                            @NotNull MessageChannel outboundChannel) {
         Assert.notNull(inboundChannel, "inbound channel is required");
         Assert.notNull(outboundChannel, "outbound channel is required");
+
         this.inboundChannel = inboundChannel;
         this.outboundChannel = outboundChannel;
+
+        this.template = new JsonRpcSendingTemplate(outboundChannel);
     }
 
     @Override
-    protected String getMappingForMethod(Method method, Class<?> handlerType) {
-        RequestMapping annotation = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
+    protected String getMappingForMethod(java.lang.reflect.Method method, Class<?> handlerType) {
+        Method annotation = AnnotatedElementUtils.findMergedAnnotation(method, Method.class);
         if (annotation != null) {
             if (StringUtils.isEmpty(annotation.value())) {
                 throw new IllegalStateException("Request mapping annotation required value");
@@ -62,7 +65,7 @@ public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler impl
             return annotation.value();
         }
 
-        SubscribeMapping subscribe = AnnotatedElementUtils.findMergedAnnotation(method, SubscribeMapping.class);
+        Subscribe subscribe = AnnotatedElementUtils.findMergedAnnotation(method, Subscribe.class);
         if (subscribe != null) {
             if (StringUtils.isEmpty(subscribe.value())) {
                 throw new IllegalStateException("Subscribe annotation required value");
@@ -74,7 +77,6 @@ public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler impl
 
     @Override
     protected List<HandlerMethodReturnValueHandler> initMethodReturnValue() {
-        JsonRpcSendingTemplate template = new JsonRpcSendingTemplate(outboundChannel);
         ResponseMethodReturnValueHandler responseMethodReturnValueHandler = new ResponseMethodReturnValueHandler(template);
         SubscribeMethodReturnValueHandler subscribeMethodReturnValueHandler = new SubscribeMethodReturnValueHandler(template);
         return Arrays.asList(responseMethodReturnValueHandler, subscribeMethodReturnValueHandler);
@@ -100,10 +102,7 @@ public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler impl
         Message<JsonRpcResponse> responseMessage = MessageBuilder.fromPayload(jsonRpcResponse)
                 .withHeaders(message.getMessageHeader())
                 .build();
-        boolean send = outboundChannel.send(responseMessage);
-        if (!send) {
-            logger.debug("Error while send message = {}", responseMessage);
-        }
+        template.send(destination, responseMessage);
     }
 
     @Override
