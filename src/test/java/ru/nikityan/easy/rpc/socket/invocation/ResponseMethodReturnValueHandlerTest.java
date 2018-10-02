@@ -9,9 +9,10 @@ import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.SynthesizingMethodParameter;
 import ru.nikityan.easy.rpc.socket.Message;
 import ru.nikityan.easy.rpc.socket.core.MessageSendingOperations;
-import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Method;
+import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.RequestMethod;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,8 +39,8 @@ public class ResponseMethodReturnValueHandlerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        java.lang.reflect.Method annotatedMethod = ResponseMethodReturnValueHandlerTest.class.getDeclaredMethod("handle");
-        java.lang.reflect.Method notAnnotatedMethod = ResponseMethodReturnValueHandlerTest.class.getDeclaredMethod("notHandle");
+        Method annotatedMethod = ResponseMethodReturnValueHandlerTest.class.getDeclaredMethod("handle");
+        Method notAnnotatedMethod = ResponseMethodReturnValueHandlerTest.class.getDeclaredMethod("notHandle");
 
         this.annotatedMethodParameter = new SynthesizingMethodParameter(annotatedMethod, 0);
         this.methodParameter = new SynthesizingMethodParameter(notAnnotatedMethod, 0);
@@ -74,7 +75,7 @@ public class ResponseMethodReturnValueHandlerTest {
         verify(messageSendingOperations).send(any());
     }
 
-    @Method("handle")
+    @RequestMethod("handle")
     private void handle() {
 
     }

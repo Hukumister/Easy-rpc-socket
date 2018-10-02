@@ -17,7 +17,7 @@ import ru.nikityan.easy.rpc.socket.invocation.HandlerMethodReturnValueHandler;
 import ru.nikityan.easy.rpc.socket.invocation.ResponseMethodReturnValueHandler;
 import ru.nikityan.easy.rpc.socket.invocation.SubscribeMethodReturnValueHandler;
 import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Controller;
-import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Method;
+import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.RequestMethod;
 import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Subscribe;
 import ru.nikityan.easy.rpc.socket.support.AbstractMessageHandler;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
@@ -57,7 +57,7 @@ public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler impl
 
     @Override
     protected String getMappingForMethod(java.lang.reflect.Method method, Class<?> handlerType) {
-        Method annotation = AnnotatedElementUtils.findMergedAnnotation(method, Method.class);
+        RequestMethod annotation = AnnotatedElementUtils.findMergedAnnotation(method, RequestMethod.class);
         if (annotation != null) {
             if (StringUtils.isEmpty(annotation.value())) {
                 throw new IllegalStateException("Request mapping annotation required value");
