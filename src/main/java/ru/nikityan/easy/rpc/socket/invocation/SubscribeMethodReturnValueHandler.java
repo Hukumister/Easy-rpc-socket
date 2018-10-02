@@ -6,7 +6,7 @@ import ru.nikityan.easy.rpc.socket.Message;
 import ru.nikityan.easy.rpc.socket.MessageHeaders;
 import ru.nikityan.easy.rpc.socket.core.MessageSendingOperations;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcResponse;
-import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.SubscribeMapping;
+import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Subscribe;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 import ru.nikityan.easy.rpc.socket.support.MessageHeaderAccessor;
 
@@ -23,7 +23,7 @@ public class SubscribeMethodReturnValueHandler implements HandlerMethodReturnVal
 
     @Override
     public boolean supportsReturnType(MethodParameter returnType) {
-        return returnType.hasMethodAnnotation(SubscribeMapping.class);
+        return returnType.hasMethodAnnotation(Subscribe.class);
     }
 
     @Override
@@ -36,10 +36,10 @@ public class SubscribeMethodReturnValueHandler implements HandlerMethodReturnVal
         }
         MessageHeaders messageHeader = message.getMessageHeader();
         MessageHeaderAccessor messageHeaderAccessor = MessageHeaderAccessor.ofMessage(message);
-        SubscribeMapping methodAnnotation = returnType.getMethodAnnotation(SubscribeMapping.class);
+        Subscribe methodAnnotation = returnType.getMethodAnnotation(Subscribe.class);
         messageHeaderAccessor.setSubscribeName(methodAnnotation.value());
+        messageHeaderAccessor.setSendMessageMethod(methodAnnotation.value());
         MessageHeaders messageHeaders = messageHeaderAccessor.getMessageHeaders();
-
         JsonRpcResponse rpcResponse = new JsonRpcResponse(messageHeader.getId(), returnValue);
         Message<JsonRpcResponse> responseMessage = MessageBuilder.fromPayload(rpcResponse)
                 .withHeaders(messageHeaders)

@@ -9,11 +9,9 @@ import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.SynthesizingMethodParameter;
 import ru.nikityan.easy.rpc.socket.Message;
 import ru.nikityan.easy.rpc.socket.core.MessageSendingOperations;
-import ru.nikityan.easy.rpc.socket.handler.resolvers.ParamArgumentResolverTest;
-import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.RequestMapping;
+import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Method;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,8 +38,8 @@ public class ResponseMethodReturnValueHandlerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        Method annotatedMethod = ResponseMethodReturnValueHandlerTest.class.getDeclaredMethod("handle");
-        Method notAnnotatedMethod = ResponseMethodReturnValueHandlerTest.class.getDeclaredMethod("notHandle");
+        java.lang.reflect.Method annotatedMethod = ResponseMethodReturnValueHandlerTest.class.getDeclaredMethod("handle");
+        java.lang.reflect.Method notAnnotatedMethod = ResponseMethodReturnValueHandlerTest.class.getDeclaredMethod("notHandle");
 
         this.annotatedMethodParameter = new SynthesizingMethodParameter(annotatedMethod, 0);
         this.methodParameter = new SynthesizingMethodParameter(notAnnotatedMethod, 0);
@@ -60,7 +58,7 @@ public class ResponseMethodReturnValueHandlerTest {
         map.put("bar", "foo");
 
         Message<String> message = MessageBuilder.fromPayload("sting").withHeaders(map).build();
-        returnValueHandler.handleReturnValue(123L, null, message);
+        returnValueHandler.handleReturnValue(123L, annotatedMethodParameter, message);
 
         verify(messageSendingOperations).send(any());
     }
@@ -71,12 +69,12 @@ public class ResponseMethodReturnValueHandlerTest {
                 .fromPayload("sting")
                 .build();
 
-        returnValueHandler.handleReturnValue(123L, null, message);
+        returnValueHandler.handleReturnValue(123L, annotatedMethodParameter, message);
 
         verify(messageSendingOperations).send(any());
     }
 
-    @RequestMapping("handle")
+    @Method("handle")
     private void handle() {
 
     }

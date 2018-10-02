@@ -15,7 +15,7 @@ import ru.nikityan.easy.rpc.socket.Message;
 import ru.nikityan.easy.rpc.socket.MessageHeaders;
 import ru.nikityan.easy.rpc.socket.core.MessageSendingOperations;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcRequest;
-import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.SubscribeMapping;
+import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Subscribe;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 import ru.nikityan.easy.rpc.socket.support.MessageHeaderAccessor;
 
@@ -74,7 +74,7 @@ public class SubscribeMethodReturnValueHandlerTest {
         subscribeMethodReturnValueHandler.handleReturnValue("return", null, message);
     }
 
-    @SubscribeMapping("method")
+    @Subscribe("method")
     private void handle() {
 
     }
