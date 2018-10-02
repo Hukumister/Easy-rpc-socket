@@ -51,7 +51,7 @@ dependencies {
     runtime "ch.qos.logback:logback-classic:$logbackVersion"
 
     /**
-     * Jettt
+     * Jetty
      */
     compile "org.eclipse.jetty.websocket:websocket-server:$jettyVersion"
     compile "org.eclipse.jetty.websocket:javax-websocket-server-impl:$jettyVersion"

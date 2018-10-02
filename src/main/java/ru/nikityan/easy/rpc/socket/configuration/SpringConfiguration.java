@@ -9,7 +9,6 @@ import ru.nikityan.easy.rpc.socket.handlers.impl.JsonRpcDispatcherHandler;
 @Import(WebSocketConfig.class)
 public class SpringConfiguration {
 
-
     @Bean
     public JsonRpcDispatcherHandler jsonRpcDispatcherHandler() {
         return new JsonRpcDispatcherHandler();
