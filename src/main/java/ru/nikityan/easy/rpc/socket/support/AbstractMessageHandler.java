@@ -116,13 +116,9 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
         handlerMethod = handlerMethod.createWithResolvedBean();
         InvocableHandlerMethod invocable = new InvocableHandlerMethod(handlerMethod);
         invocable.setArgumentResolvers(this.argumentResolverComposite);
-
         try {
             Object returnValue = invocable.invoke(message);
             MethodParameter returnType = handlerMethod.getReturnType();
-            if (void.class == returnType.getParameterType()) {
-                return;
-            }
             this.returnValueHandlers.handleReturnValue(returnValue, returnType, message);
         } catch (Exception ex) {
             processHandlerMethodException(handlerMethod, ex, message);
