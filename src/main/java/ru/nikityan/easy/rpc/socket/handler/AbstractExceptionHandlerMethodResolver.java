@@ -16,10 +16,11 @@ import java.util.Map;
  */
 public abstract class AbstractExceptionHandlerMethodResolver {
 
-    private final Map<Class<? extends Throwable>, Method> mappedMethods = new HashMap<>(16);
+    private final Map<Class<? extends Throwable>, Method> mappedMethods
+            = new HashMap<>(16);
 
-    private final Map<Class<? extends Throwable>, Method> exceptionLookupCache = new ConcurrentReferenceHashMap<>(16);
-
+    private final Map<Class<? extends Throwable>, Method> exceptionLookupCache
+            = new ConcurrentReferenceHashMap<>(16);
 
     /**
      * Protected constructor accepting exception-to-method mappings.
@@ -46,14 +47,6 @@ public abstract class AbstractExceptionHandlerMethodResolver {
             throw new IllegalStateException("No exception types mapped to " + method);
         }
         return result;
-    }
-
-
-    /**
-     * Whether the contained type has any exception mappings.
-     */
-    public boolean hasExceptionMappings() {
-        return !this.mappedMethods.isEmpty();
     }
 
     /**
