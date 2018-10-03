@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.verify;
@@ -129,6 +130,20 @@ public class JsonRpcAnnotationMessageHandlerTest {
 
 
     @Test
+    public void testSubscribeReturnVoid() throws Exception {
+        JsonRpcRequest jsonRpcRequest = new JsonRpcRequest(4, "subscribeVoid", null);
+        Message<JsonRpcRequest> message = MessageBuilder
+                .fromPayload(jsonRpcRequest)
+                .build();
+
+        messageHandler.registerHandler(testController);
+        messageHandler.handleMessage(message);
+
+        assertEquals("subscribeVoid", testController.method);
+        assertTrue(testController.arguments.isEmpty());
+    }
+
+    @Test
     public void testRequestReturnObj() throws Exception {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("id", 1);
@@ -185,6 +200,23 @@ public class JsonRpcAnnotationMessageHandlerTest {
         assertEquals("exceptionHandler", testController.method);
     }
 
+
+    @Test
+    public void testFilterExceptionHandler() throws Exception {
+        JsonRpcRequest jsonRpcRequest = new JsonRpcRequest(4, "errorArgumentMethod", null);
+        Message<JsonRpcRequest> message = MessageBuilder
+                .fromPayload(jsonRpcRequest)
+                .build();
+
+        messageHandler.registerHandler(testController);
+        messageHandler.handleMessage(message);
+
+        Object answer = testController.arguments.get("ex");
+        Answer result = (Answer) answer;
+        assertEquals("exceptionIllegalArgumentHandler", testController.method);
+        assertEquals(result.getId(), -1L);
+    }
+
     private static class TestJsonRpcAnnotationMessageHandler extends JsonRpcAnnotationMessageHandler {
 
         public TestJsonRpcAnnotationMessageHandler(@NotNull SubscribeMessageChanel inboundChannel,
@@ -204,28 +236,33 @@ public class JsonRpcAnnotationMessageHandlerTest {
 
         private Map<String, Object> arguments = new LinkedHashMap<>();
 
-        @RequestMapping("requestList")
+        @RequestMethod("requestList")
         public String requestList(@Param List<Integer> input) {
             method = "requestList";
             arguments.put("input", input);
             return "ok";
         }
 
-        @SubscribeMapping("subscribeObj")
+        @Subscribe("subscribeVoid")
+        public void subscribeVoid() {
+            method = "subscribeVoid";
+        }
+
+        @Subscribe("subscribeObj")
         public Answer subscribeObj(@Param("x") long id) {
             method = "subscribeObj";
             arguments.put("x", id);
             return new Answer("subscribeObj", id);
         }
 
-        @SubscribeMapping("subscribe")
+        @Subscribe("subscribe")
         public String subscribe(@Param long id) {
             method = "subscribe";
             arguments.put("id", id);
             return "ok";
         }
 
-        @RequestMapping("request")
+        @RequestMethod("request")
         public String request(@Param("x") long x, @Param("y") Long a) {
             method = "request";
             arguments.put("x", x);
@@ -233,7 +270,7 @@ public class JsonRpcAnnotationMessageHandlerTest {
             return "ok";
         }
 
-        @RequestMapping("requestReturnObj")
+        @RequestMethod("requestReturnObj")
         public Answer requestReturnObj(@Param("id") long id, @Param("name") String name) {
             method = "requestReturnObj";
             arguments.put("id", id);
@@ -241,9 +278,14 @@ public class JsonRpcAnnotationMessageHandlerTest {
             return new Answer(name, id);
         }
 
-        @RequestMapping("errorMethod")
+        @RequestMethod("errorMethod")
         public void errorMethod() throws Exception {
             throw new Exception("internal error");
+        }
+
+        @RequestMethod("errorArgumentMethod")
+        public void errorArgumentMethod() {
+            throw new IllegalArgumentException();
         }
 
         @ExceptionHandler
@@ -255,7 +297,7 @@ public class JsonRpcAnnotationMessageHandlerTest {
 
         @ExceptionHandler(IllegalArgumentException.class)
         public Answer exceptionHandlerRetrunObj(Exception ex) {
-            method = "exceptionHandler";
+            method = "exceptionIllegalArgumentHandler";
             arguments.put("ex", ex);
             return new Answer(ex.getLocalizedMessage(), -1);
         }
