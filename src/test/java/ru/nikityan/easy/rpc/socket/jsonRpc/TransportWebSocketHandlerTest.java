@@ -123,6 +123,23 @@ public class TransportWebSocketHandlerTest {
         assertEquals((long) value.getMessageHeader().getId(), 1L);
     }
 
+    @Test
+    public void convertToResponseIfMessagePayloadNotResponse() throws Exception {
+        MessageHeaderAccessor accessor = MessageHeaderAccessor.ofHeaders(null);
+        accessor.setMessageMethod("method");
+        accessor.setSessionId("123");
+        Message<String> stringMessage = MessageBuilder.fromPayload("string")
+                .withHeaders(accessor.getMessageHeaders())
+                .build();
+        handler.handleMessage(stringMessage);
+
+        WebSocketMessage<?> socketMessage = socketSession.getSentMessages().get(0);
+        String payload = (String) socketMessage.getPayload();
+        JsonRpcResponse response = gson.fromJson(payload, JsonRpcResponse.class);
+
+        assertEquals(response.getResult(), "string");
+    }
+
     private Message<JsonRpcNotification> notification(String subscribe, String sendMethod) {
         JsonRpcNotification notification = new JsonRpcNotification("method", null);
         MessageHeaderAccessor accessor = MessageHeaderAccessor.ofHeaders(null);
