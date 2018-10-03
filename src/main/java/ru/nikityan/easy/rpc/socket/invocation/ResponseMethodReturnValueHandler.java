@@ -30,7 +30,6 @@ public class ResponseMethodReturnValueHandler implements HandlerMethodReturnValu
     @Override
     public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
                                   Message<?> message) throws Exception {
-
         Assert.notNull(returnType, "Method parameter is required");
         MessageHeaders messageHeader = message.getMessageHeader();
         MessageHeaderAccessor accessor = MessageHeaderAccessor.ofHeaders(messageHeader);

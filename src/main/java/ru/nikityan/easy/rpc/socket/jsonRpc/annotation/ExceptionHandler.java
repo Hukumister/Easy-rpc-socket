@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExceptionHandler {
 
-    Class<?> value() default Exception.class;
+    Class<? extends Throwable>[] value() default {};
 }
