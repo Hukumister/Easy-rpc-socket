@@ -34,7 +34,7 @@ public class JsonRpcMessageConverter implements MessageConverter {
                 return MessageBuilder.fromPayload(notification)
                         .withHeaders(headers)
                         .build();
-            } else if (messageType == MessageType.RESPONCE) {
+            } else if (messageType == MessageType.RESPONSE) {
                 JsonRpcResponse rpcResponse = new JsonRpcResponse(headers.getId(), payload);
                 return MessageBuilder.fromPayload(rpcResponse)
                         .withHeaders(headers)
