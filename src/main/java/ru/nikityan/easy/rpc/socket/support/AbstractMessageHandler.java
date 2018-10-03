@@ -139,9 +139,6 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
                     invocable.invoke(message, exception, cause, handlerMethod) :
                     invocable.invoke(message, exception, handlerMethod));
             MethodParameter returnType = invocable.getReturnType();
-            if (void.class == returnType.getParameterType()) {
-                return;
-            }
             this.returnValueHandlers.handleReturnValue(returnValue, returnType, message);
         } catch (Throwable throwable) {
             logger.error("Error while processing handler method exception", throwable);

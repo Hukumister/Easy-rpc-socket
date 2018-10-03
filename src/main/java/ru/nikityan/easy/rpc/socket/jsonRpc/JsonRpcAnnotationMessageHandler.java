@@ -13,6 +13,7 @@ import ru.nikityan.easy.rpc.socket.core.JsonRpcSendingTemplate;
 import ru.nikityan.easy.rpc.socket.handler.AbstractExceptionHandlerMethodResolver;
 import ru.nikityan.easy.rpc.socket.handler.resolvers.ArgumentResolver;
 import ru.nikityan.easy.rpc.socket.handler.resolvers.ParamArgumentResolver;
+import ru.nikityan.easy.rpc.socket.invocation.ExceptionMethodReturnValueHandler;
 import ru.nikityan.easy.rpc.socket.invocation.HandlerMethodReturnValueHandler;
 import ru.nikityan.easy.rpc.socket.invocation.ResponseMethodReturnValueHandler;
 import ru.nikityan.easy.rpc.socket.invocation.SubscribeMethodReturnValueHandler;
@@ -40,8 +41,6 @@ public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler impl
     private final SubscribeMessageChanel inboundChannel;
 
     @NotNull
-    private final MessageChannel outboundChannel;
-
     private final JsonRpcSendingTemplate template;
 
     public JsonRpcAnnotationMessageHandler(@NotNull SubscribeMessageChanel inboundChannel,
@@ -50,8 +49,6 @@ public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler impl
         Assert.notNull(outboundChannel, "outbound channel is required");
 
         this.inboundChannel = inboundChannel;
-        this.outboundChannel = outboundChannel;
-
         this.template = new JsonRpcSendingTemplate(outboundChannel);
     }
 
@@ -79,7 +76,10 @@ public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler impl
     protected List<HandlerMethodReturnValueHandler> initMethodReturnValue() {
         ResponseMethodReturnValueHandler responseMethodReturnValueHandler = new ResponseMethodReturnValueHandler(template);
         SubscribeMethodReturnValueHandler subscribeMethodReturnValueHandler = new SubscribeMethodReturnValueHandler(template);
-        return Arrays.asList(responseMethodReturnValueHandler, subscribeMethodReturnValueHandler);
+        ExceptionMethodReturnValueHandler exceptionMethodReturnValueHandler = new ExceptionMethodReturnValueHandler(template);
+        return Arrays.asList(responseMethodReturnValueHandler,
+                subscribeMethodReturnValueHandler,
+                exceptionMethodReturnValueHandler);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler impl
 
     @Override
     protected AbstractExceptionHandlerMethodResolver createExceptionHandlerMethodResolverFor(Class<?> beanType) {
-        return null;
+        return new AnnotationExceptionHandlerMethodResolver(beanType);
     }
 
     @Override

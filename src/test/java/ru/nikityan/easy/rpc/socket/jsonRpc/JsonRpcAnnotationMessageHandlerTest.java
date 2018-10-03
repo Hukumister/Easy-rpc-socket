@@ -44,6 +44,8 @@ public class JsonRpcAnnotationMessageHandlerTest {
 
     private TestController testController;
 
+    private FailAnnotationController failAnnotationController;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -55,6 +57,7 @@ public class JsonRpcAnnotationMessageHandlerTest {
         when(messageChannel.send(any())).thenReturn(true);
 
         testController = new TestController();
+        failAnnotationController = new FailAnnotationController();
     }
 
     @Test
@@ -211,10 +214,15 @@ public class JsonRpcAnnotationMessageHandlerTest {
         messageHandler.registerHandler(testController);
         messageHandler.handleMessage(message);
 
-        Object answer = testController.arguments.get("ex");
-        Answer result = (Answer) answer;
+        Object argument = testController.arguments.get("ex");
+        Exception result = (Exception) argument;
         assertEquals("exceptionIllegalArgumentHandler", testController.method);
-        assertEquals(result.getId(), -1L);
+        assertEquals(result.getLocalizedMessage(), "exception message");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void ifAnnotationIsEmptyThrowError() throws Exception {
+        messageHandler.registerHandler(failAnnotationController);
     }
 
     private static class TestJsonRpcAnnotationMessageHandler extends JsonRpcAnnotationMessageHandler {
@@ -285,7 +293,7 @@ public class JsonRpcAnnotationMessageHandlerTest {
 
         @RequestMethod("errorArgumentMethod")
         public void errorArgumentMethod() {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("exception message");
         }
 
         @ExceptionHandler
@@ -300,6 +308,19 @@ public class JsonRpcAnnotationMessageHandlerTest {
             method = "exceptionIllegalArgumentHandler";
             arguments.put("ex", ex);
             return new Answer(ex.getLocalizedMessage(), -1);
+        }
+    }
+
+    private static class FailAnnotationController {
+
+        @Subscribe("")
+        public void subscribe() {
+
+        }
+
+        @RequestMethod("")
+        public void method() {
+
         }
     }
 
