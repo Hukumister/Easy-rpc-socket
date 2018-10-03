@@ -11,10 +11,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
-import ru.nikityan.easy.rpc.socket.Message;
-import ru.nikityan.easy.rpc.socket.MessageChannel;
-import ru.nikityan.easy.rpc.socket.MessageHandler;
-import ru.nikityan.easy.rpc.socket.SubscribeMessageChanel;
+import ru.nikityan.easy.rpc.socket.*;
 import ru.nikityan.easy.rpc.socket.core.JsonRpcIncomingConverter;
 import ru.nikityan.easy.rpc.socket.core.MessageConverter;
 import ru.nikityan.easy.rpc.socket.exceptions.JsonRequestException;
@@ -188,9 +185,16 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
     }
 
     private void sendMessage(WebSocketSession socketSession, Message<?> message) {
+        JsonRpcResponse rpcResponse;
+        Object payload = message.getPayload();
+        if (payload instanceof JsonRpcResponse) {
+            rpcResponse = (JsonRpcResponse) payload;
+        } else {
+            MessageHeaders messageHeader = message.getMessageHeader();
+            rpcResponse = new JsonRpcResponse(messageHeader.getId(), payload);
+        }
+        String json = gson.toJson(rpcResponse);
         try {
-            Object payload = message.getPayload();
-            String json = gson.toJson(payload);
             TextMessage textMessage = new TextMessage(json);
             socketSession.sendMessage(textMessage);
         } catch (IOException ex) {
