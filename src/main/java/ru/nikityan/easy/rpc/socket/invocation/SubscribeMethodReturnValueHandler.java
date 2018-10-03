@@ -36,11 +36,14 @@ public class SubscribeMethodReturnValueHandler implements HandlerMethodReturnVal
         }
         MessageHeaders messageHeader = message.getMessageHeader();
         MessageHeaderAccessor messageHeaderAccessor = MessageHeaderAccessor.ofMessage(message);
+
         Subscribe methodAnnotation = returnType.getMethodAnnotation(Subscribe.class);
         messageHeaderAccessor.setSubscribeName(methodAnnotation.value());
-        messageHeaderAccessor.setSendMessageMethod(methodAnnotation.value());
+        messageHeaderAccessor.setMessageMethod(methodAnnotation.value());
+
         MessageHeaders messageHeaders = messageHeaderAccessor.getMessageHeaders();
         JsonRpcResponse rpcResponse = new JsonRpcResponse(messageHeader.getId(), returnValue);
+
         Message<JsonRpcResponse> responseMessage = MessageBuilder.fromPayload(rpcResponse)
                 .withHeaders(messageHeaders)
                 .build();
