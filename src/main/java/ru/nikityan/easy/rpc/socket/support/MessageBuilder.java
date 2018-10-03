@@ -10,7 +10,6 @@ import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcNotification;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcRequest;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcResponse;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -61,12 +60,10 @@ public final class MessageBuilder<T> {
         }
         if (payload instanceof JsonRpcRequest) {
             JsonRpcRequest request = (JsonRpcRequest) this.payload;
-            if (headers == null) {
-                headers = new HashMap<>();
-            }
-            headers.put(MessageHeaderAccessor.MESSAGE_METHOD, request.getMethod());
             MessageHeaders messageHeaders = new MessageHeaders(headers, MessageType.REQUEST, request.getId());
-            return (Message<T>) new RequestMessage(request, messageHeaders);
+            MessageHeaderAccessor accessor = MessageHeaderAccessor.ofHeaders(messageHeaders);
+            accessor.setMessageMethod(request.getMethod());
+            return (Message<T>) new RequestMessage(request, accessor.getMessageHeaders());
         }
         return new GenericMessage<>(payload, headers);
     }
