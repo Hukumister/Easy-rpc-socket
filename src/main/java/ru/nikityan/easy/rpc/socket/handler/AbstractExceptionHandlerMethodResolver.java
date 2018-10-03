@@ -78,12 +78,7 @@ public abstract class AbstractExceptionHandlerMethodResolver {
      */
     @Nullable
     public Method resolveMethodByExceptionType(Class<? extends Throwable> exceptionType) {
-        Method method = this.exceptionLookupCache.get(exceptionType);
-        if (method == null) {
-            method = getMappedMethod(exceptionType);
-            this.exceptionLookupCache.put(exceptionType, method);
-        }
-        return method;
+        return this.exceptionLookupCache.computeIfAbsent(exceptionType, k -> getMappedMethod(exceptionType));
     }
 
     /**

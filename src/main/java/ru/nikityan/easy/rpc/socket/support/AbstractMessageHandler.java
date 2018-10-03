@@ -99,6 +99,7 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
         handleMessageInternal(message, destination);
     }
 
+    @Nullable
     public ApplicationContext getApplicationContext() {
         return this.applicationContext;
     }

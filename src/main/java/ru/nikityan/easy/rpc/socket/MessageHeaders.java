@@ -1,5 +1,7 @@
 package ru.nikityan.easy.rpc.socket;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -100,7 +102,7 @@ public class MessageHeaders implements Map<String, Object> {
     }
 
     @Override
-    public void putAll(Map<? extends String, ?> m) {
+    public void putAll(@NotNull Map<? extends String, ?> m) {
         throw new UnsupportedOperationException("MessageHeaders is immutable");
     }
 

@@ -165,6 +165,10 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
         String sessionId = MessageHeaderAccessor.getSessionId(message.getMessageHeader());
         WebSocketSession webSocketSession = sessions.get(sessionId);
 
+        if (webSocketSession == null) {
+            return;
+        }
+
         String subscribeMethod = MessageHeaderAccessor.getSubscribeMethod(message.getMessageHeader());
         String sendMessageMethod = MessageHeaderAccessor.getSendMessageMethod(message.getMessageHeader());
 

@@ -137,11 +137,10 @@ public class InvocableHandlerMethod extends HandlerMethod {
      * @param text error message to append the HandlerMethod details to
      */
     protected String getDetailedErrorMessage(String text) {
-        StringBuilder sb = new StringBuilder(text).append("\n");
-        sb.append("HandlerMethod details: \n");
-        sb.append("Endpoint [").append(getBeanType().getName()).append("]\n");
-        sb.append("Method [").append(getBridgedMethod().toGenericString()).append("]\n");
-        return sb.toString();
+        return text + "\n" +
+                "HandlerMethod details: \n" +
+                "Endpoint [" + getBeanType().getName() + "]\n" +
+                "Method [" + getBridgedMethod().toGenericString() + "]\n";
     }
 
     private Object resolveProvidedArgument(MethodParameter parameter, Object... providedArgs) {
