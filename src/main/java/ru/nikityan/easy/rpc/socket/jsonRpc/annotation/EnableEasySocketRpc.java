@@ -2,12 +2,13 @@ package ru.nikityan.easy.rpc.socket.jsonRpc.annotation;
 
 
 import org.springframework.context.annotation.Import;
-import ru.nikityan.easy.rpc.socket.configuration.SpringConfiguration;
+import ru.nikityan.easy.rpc.socket.configuration.JsonRpcConfiguration;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.*;
 
-@Import(SpringConfiguration.class)
 @Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Documented
+@Import(JsonRpcConfiguration.class)
 public @interface EnableEasySocketRpc {
 }
