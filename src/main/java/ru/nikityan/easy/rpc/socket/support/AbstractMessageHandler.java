@@ -21,6 +21,8 @@ import ru.nikityan.easy.rpc.socket.handler.resolvers.ArgumentResolver;
 import ru.nikityan.easy.rpc.socket.handler.resolvers.ArgumentResolverComposite;
 import ru.nikityan.easy.rpc.socket.invocation.HandlerMethodReturnValueHandler;
 import ru.nikityan.easy.rpc.socket.invocation.HandlerMethodReturnValueHandlerComposite;
+import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcError;
+import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcResponse;
 
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
@@ -129,7 +131,7 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
     protected void processHandlerMethodException(HandlerMethod handlerMethod, Exception exception, Message<?> message) {
         InvocableHandlerMethod invocable = getExceptionHandlerMethod(handlerMethod, exception);
         if (invocable == null) {
-            logger.error("Unhandled exception from message handler method", exception);
+            handleDefaultError(exception, message);
             return;
         }
         invocable.setArgumentResolvers(this.argumentResolverComposite);
@@ -145,6 +147,8 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
             logger.error("Error while processing handler method exception", throwable);
         }
     }
+
+    protected abstract void handleDefaultError(Exception exception, Message<?> message);
 
     private InvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod handlerMethod, Exception exception) {
         if (logger.isDebugEnabled()) {

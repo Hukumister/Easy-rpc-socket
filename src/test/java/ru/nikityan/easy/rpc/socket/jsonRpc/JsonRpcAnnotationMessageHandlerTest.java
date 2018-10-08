@@ -8,6 +8,7 @@ import org.hamcrest.Description;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.support.StaticApplicationContext;
@@ -46,6 +47,10 @@ public class JsonRpcAnnotationMessageHandlerTest {
 
     private FailAnnotationController failAnnotationController;
 
+    private DuplicateController duplicateController;
+
+    private ControllerWitoutExHandler controllerWitoutExHandler;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -58,6 +63,8 @@ public class JsonRpcAnnotationMessageHandlerTest {
 
         testController = new TestController();
         failAnnotationController = new FailAnnotationController();
+        duplicateController = new DuplicateController();
+        controllerWitoutExHandler = new ControllerWitoutExHandler();
     }
 
     @Test
@@ -225,6 +232,29 @@ public class JsonRpcAnnotationMessageHandlerTest {
         messageHandler.registerHandler(failAnnotationController);
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void trowExIfDuplicateName() throws Exception {
+        messageHandler.registerHandler(duplicateController);
+    }
+
+    @Test
+    public void ifNotFoundExHandlerReturnSimpleMessageWithJsonRpcError() throws Exception {
+        JsonRpcRequest jsonRpcRequest = new JsonRpcRequest(4, "name", null);
+        Message<JsonRpcRequest> requestMessage = MessageBuilder
+                .fromPayload(jsonRpcRequest)
+                .build();
+
+        messageHandler.registerHandler(controllerWitoutExHandler);
+        messageHandler.handleMessage(requestMessage);
+        ArgumentCaptor<Message> argumentCaptor = ArgumentCaptor.forClass(Message.class);
+
+        verify(messageChannel).send(argumentCaptor.capture());
+        Message message = argumentCaptor.getValue();
+        JsonRpcResponse payload = (JsonRpcResponse) message.getPayload();
+
+        assertEquals(payload.getError(), JsonRpcError.internalError());
+    }
+
     private static class TestJsonRpcAnnotationMessageHandler extends JsonRpcAnnotationMessageHandler {
 
         public TestJsonRpcAnnotationMessageHandler(@NotNull SubscribeMessageChanel inboundChannel,
@@ -311,6 +341,7 @@ public class JsonRpcAnnotationMessageHandlerTest {
         }
     }
 
+    @Controller
     private static class FailAnnotationController {
 
         @Subscribe("")
@@ -321,6 +352,29 @@ public class JsonRpcAnnotationMessageHandlerTest {
         @RequestMethod("")
         public void method() {
 
+        }
+    }
+
+    @Controller
+    private static class DuplicateController {
+
+        @Subscribe("name")
+        public void subscribe() {
+
+        }
+
+        @RequestMethod("name")
+        public void method() {
+
+        }
+    }
+
+    @Controller
+    private static class ControllerWitoutExHandler {
+
+        @RequestMethod("name")
+        public void method() throws Exception {
+            throw new Exception("error");
         }
     }
 

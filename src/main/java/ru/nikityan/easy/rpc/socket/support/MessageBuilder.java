@@ -51,7 +51,7 @@ public final class MessageBuilder<T> {
         Assert.notNull(payload, "Payload must not be null");
         if (payload instanceof JsonRpcResponse) {
             JsonRpcResponse response = (JsonRpcResponse) this.payload;
-            MessageHeaders messageHeaders = new MessageHeaders(headers, MessageType.RESPONCE, response.getId());
+            MessageHeaders messageHeaders = new MessageHeaders(headers, MessageType.RESPONSE, response.getId());
             return (Message<T>) new ResponseMessage(response, messageHeaders);
         }
         if (payload instanceof JsonRpcNotification) {

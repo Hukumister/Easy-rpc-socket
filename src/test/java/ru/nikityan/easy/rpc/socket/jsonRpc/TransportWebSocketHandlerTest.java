@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.socket.TextMessage;
@@ -33,7 +32,6 @@ public class TransportWebSocketHandlerTest {
     @Mock
     private SubscribeMessageChanel inChanel;
 
-    @InjectMocks
     private TransportWebSocketHandler handler;
 
     private TestWebSocketSession socketSession = new TestWebSocketSession();
@@ -42,6 +40,7 @@ public class TransportWebSocketHandlerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        handler = new TransportWebSocketHandler(inChanel, outChanel);
         socketSession.setId("123");
         socketSession.setOpen(true);
 
@@ -113,7 +112,6 @@ public class TransportWebSocketHandlerTest {
         ArgumentCaptor<Message> arg = ArgumentCaptor.forClass(Message.class);
 
         handler.handleMessage(socketSession, message);
-
         verify(outChanel).send(arg.capture());
 
         Message<?> value = arg.getValue();

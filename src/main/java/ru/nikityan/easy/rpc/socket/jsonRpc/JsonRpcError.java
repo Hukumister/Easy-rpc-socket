@@ -36,6 +36,11 @@ public class JsonRpcError {
         return new JsonRpcError(-32601, "Method not found");
     }
 
+    @NotNull
+    public static JsonRpcError internalError() {
+        return new JsonRpcError(-32000, "Internal server error");
+    }
+
     /**
      * @param code    json rpc code error
      * @param message error message for jsonRpcError

@@ -54,7 +54,7 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
 
     public TransportWebSocketHandler(SubscribeMessageChanel clientInboundChannel, MessageChannel clientOutboundChannel) {
         Assert.notNull(clientInboundChannel, "Inbound MessageChannel must not be null");
-        Assert.notNull(clientInboundChannel, "Outbound MessageChannel must not be null");
+        Assert.notNull(clientOutboundChannel, "Outbound MessageChannel must not be null");
 
         this.clientOutboundChannel = clientOutboundChannel;
         this.clientInboundChannel = clientInboundChannel;

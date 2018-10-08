@@ -117,6 +117,16 @@ public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler impl
     }
 
     @Override
+    protected void handleDefaultError(Exception exception, Message<?> message) {
+        JsonRpcResponse rpcResponse = new JsonRpcResponse(message.getMessageHeader().getId(),
+                JsonRpcError.internalError());
+        Message<JsonRpcResponse> responseMessage = MessageBuilder.fromPayload(rpcResponse)
+                .withHeaders(message.getMessageHeader())
+                .build();
+        template.send(responseMessage);
+    }
+
+    @Override
     public boolean isAutoStartup() {
         return true;
     }

@@ -43,7 +43,7 @@ public class JsonRpcMessageConverterTest {
 
         MessageHeaderAccessor accessor = MessageHeaderAccessor.ofHeaders(null);
         accessor.setMessageMethod("message");
-        accessor.setMessageType(MessageType.RESPONCE);
+        accessor.setMessageType(MessageType.RESPONSE);
 
         Message<?> message = converter.toMessage(result, accessor.getMessageHeaders());
         JsonRpcResponse jsonRpcResponse = (JsonRpcResponse) message.getPayload();
