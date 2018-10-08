@@ -1,17 +1,21 @@
 package ru.nikityan.easy.rpc.socket;
 
 /**
- * @param <T>
+ * Interface describe message. Message must contain body and headers {@link MessageHeaders}
+ *
+ * @param <T> the body type.
+ * @author CodeRedWolf.
+ * @since 1.0
  */
 public interface Message<T> {
 
     /**
-     * @return
+     * Gets a message payload.
      */
     T getPayload();
 
     /**
-     * @return
+     * Return message headers
      */
     MessageHeaders getMessageHeader();
 }

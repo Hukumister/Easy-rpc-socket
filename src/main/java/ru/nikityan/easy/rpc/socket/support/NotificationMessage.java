@@ -4,15 +4,19 @@ import ru.nikityan.easy.rpc.socket.MessageHeaders;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcNotification;
 
 /**
- * Created by Nikit on 17.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class NotificationMessage extends GenericMessage<JsonRpcNotification> {
 
     private final JsonRpcNotification notification;
 
     /**
-     * @param notification
-     * @param messageHeaders
+     * Create notification message from request {@link NotificationMessage}
+     * and message headers {@link MessageHeaders}.
+     *
+     * @param notification   given notification object.
+     * @param messageHeaders given message headers.
      */
     public NotificationMessage(JsonRpcNotification notification, MessageHeaders messageHeaders) {
         super(notification, messageHeaders);
@@ -20,16 +24,9 @@ public class NotificationMessage extends GenericMessage<JsonRpcNotification> {
     }
 
     /**
-     * @return
+     * Gets a notification.
      */
     public JsonRpcNotification getNotification() {
         return notification;
-    }
-
-    @Override
-    public String toString() {
-        return "NotificationMessage{" +
-                "notification=" + notification +
-                '}';
     }
 }

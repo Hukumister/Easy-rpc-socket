@@ -9,10 +9,16 @@ import ru.nikityan.easy.rpc.socket.MessageType;
 import java.util.Map;
 
 /**
- * Created by Nikit on 28.09.2018.
+ * This class allows to modify message headers.
+ *
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class MessageHeaderAccessor {
 
+    /**
+     * Session id for message.
+     */
     public final static String SESSION_ID = "sessionId";
 
     public final static String SUBSCRIBE_METHOD = "subscribeMethodName";
