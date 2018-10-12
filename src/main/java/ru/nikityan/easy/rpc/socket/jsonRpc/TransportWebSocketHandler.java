@@ -20,10 +20,12 @@ import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 import ru.nikityan.easy.rpc.socket.support.MessageHeaderAccessor;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.stream.Collectors;
 
 /**
  * Created by Nikit on 02.10.2018.
@@ -36,7 +38,7 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
 
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
-    private final Map<String, Set<WebSocketSession>> subscribers = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> subscribers = new ConcurrentHashMap<>();
 
     private final MessageConverter messageConverter = new JsonRpcIncomingConverter();
 
@@ -52,6 +54,10 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
 
     private final MessageChannel clientOutboundChannel;
 
+    /**
+     * @param clientInboundChannel
+     * @param clientOutboundChannel
+     */
     public TransportWebSocketHandler(SubscribeMessageChanel clientInboundChannel, MessageChannel clientOutboundChannel) {
         Assert.notNull(clientInboundChannel, "Inbound MessageChannel must not be null");
         Assert.notNull(clientOutboundChannel, "Outbound MessageChannel must not be null");
@@ -119,6 +125,11 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
         logger.debug("Open connection webSocket session, sessionId = {}", session.getId());
     }
 
+    /**
+     * @param session
+     * @param message
+     * @throws Exception
+     */
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         try {
@@ -137,6 +148,68 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
         }
     }
 
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+        logger.debug("Close connection, webSocket sessionId = {}, close status = {}", session.getId(), closeStatus);
+        this.sessions.remove(session.getId());
+        this.subscribers.values().forEach(webSocketSessions -> webSocketSessions.remove(session.getId()));
+    }
+
+    @Override
+    public boolean supportsPartialMessages() {
+        return false;
+    }
+
+    @Override
+    public void handleMessage(Message<?> message) throws MessagingException {
+        String subscribeMethod = MessageHeaderAccessor.getSubscribeMethod(message.getMessageHeader());
+        String sendMessageMethod = MessageHeaderAccessor.getSendMessageMethod(message.getMessageHeader());
+
+        String sessionId = MessageHeaderAccessor.getSessionId(message.getMessageHeader());
+        if (sessionId == null) {
+            if (sendMessageMethod != null) {
+                broadCastMessage(sendMessageMethod, message);
+            }
+            return;
+        }
+
+        WebSocketSession webSocketSession = sessions.get(sessionId);
+        if (webSocketSession == null) {
+            return;
+        }
+
+        if (subscribeMethod != null) {
+            if (!subscribers.containsKey(subscribeMethod)) {
+                subscribers.put(subscribeMethod, new CopyOnWriteArraySet<>());
+            }
+            subscribers.get(subscribeMethod).add(sessionId);
+            sendMessage(webSocketSession, message);
+            return;
+        }
+
+        sendMessage(webSocketSession, message);
+    }
+
+    public int getSendTimeLimit() {
+        return sendTimeLimit;
+    }
+
+    public void setSendTimeLimit(int sendTimeLimit) {
+        this.sendTimeLimit = sendTimeLimit;
+    }
+
+    public int getSendBufferSizeLimit() {
+        return sendBufferSizeLimit;
+    }
+
+    public void setSendBufferSizeLimit(int sendBufferSizeLimit) {
+        this.sendBufferSizeLimit = sendBufferSizeLimit;
+    }
+
+    protected WebSocketSession decorateSession(WebSocketSession session) {
+        return new ConcurrentWebSocketSessionDecorator(session, getSendTimeLimit(), getSendBufferSizeLimit());
+    }
+
     private void handleFailRequest(WebSocketSession session, JsonRequestException exception) {
         JsonRpcRequest request = exception.getOriginalRequest();
         JsonRpcResponse rpcResponse;
@@ -147,45 +220,6 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
         }
         Message<JsonRpcResponse> message = MessageBuilder.fromPayload(rpcResponse).build();
         sendMessage(session, message);
-    }
-
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        logger.debug("Close connection, webSocket sessionId = {}, close status = {}", session.getId(), closeStatus);
-        this.sessions.remove(session.getId());
-    }
-
-    @Override
-    public boolean supportsPartialMessages() {
-        return false;
-    }
-
-    @Override
-    public void handleMessage(Message<?> message) throws MessagingException {
-        String sessionId = MessageHeaderAccessor.getSessionId(message.getMessageHeader());
-        WebSocketSession webSocketSession = sessions.get(sessionId);
-
-        if (webSocketSession == null) {
-            return;
-        }
-
-        String subscribeMethod = MessageHeaderAccessor.getSubscribeMethod(message.getMessageHeader());
-        String sendMessageMethod = MessageHeaderAccessor.getSendMessageMethod(message.getMessageHeader());
-
-        if (subscribeMethod != null) {
-            if (!subscribers.containsKey(subscribeMethod)) {
-                subscribers.put(subscribeMethod, new CopyOnWriteArraySet<>());
-            }
-            subscribers.get(subscribeMethod).add(webSocketSession);
-            sendMessage(webSocketSession, message);
-            return;
-        }
-
-        if (sendMessageMethod != null) {
-            broadCastMessage(sendMessageMethod, message);
-        } else {
-            sendMessage(webSocketSession, message);
-        }
     }
 
     private void sendMessage(WebSocketSession socketSession, Message<?> message) {
@@ -207,33 +241,16 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
     }
 
     private void broadCastMessage(String method, Message<?> message) {
-        Set<WebSocketSession> sessions = subscribers.get(method);
-        if (sessions == null) {
+        Set<String> ids = subscribers.get(method);
+        List<WebSocketSession> socketSessions = ids.stream()
+                .map(sessions::get)
+                .collect(Collectors.toList());
+        if (socketSessions == null) {
             logger.debug("Session set is null");
             return;
         }
-        for (WebSocketSession socketSession : sessions) {
+        for (WebSocketSession socketSession : socketSessions) {
             sendMessage(socketSession, message);
         }
-    }
-
-    protected WebSocketSession decorateSession(WebSocketSession session) {
-        return new ConcurrentWebSocketSessionDecorator(session, getSendTimeLimit(), getSendBufferSizeLimit());
-    }
-
-    public int getSendTimeLimit() {
-        return sendTimeLimit;
-    }
-
-    public void setSendTimeLimit(int sendTimeLimit) {
-        this.sendTimeLimit = sendTimeLimit;
-    }
-
-    public int getSendBufferSizeLimit() {
-        return sendBufferSizeLimit;
-    }
-
-    public void setSendBufferSizeLimit(int sendBufferSizeLimit) {
-        this.sendBufferSizeLimit = sendBufferSizeLimit;
     }
 }

@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import ru.nikityan.easy.rpc.socket.Message;
@@ -16,7 +17,8 @@ import ru.nikityan.easy.rpc.socket.TestWebSocketSession;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 import ru.nikityan.easy.rpc.socket.support.MessageHeaderAccessor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -24,7 +26,7 @@ import static org.mockito.Mockito.verify;
  */
 public class TransportWebSocketHandlerTest {
 
-    private final Gson gson = new GsonBuilder().create();
+    private static final Gson gson = new GsonBuilder().create();
 
     @Mock
     private MessageChannel outChanel;
@@ -35,6 +37,7 @@ public class TransportWebSocketHandlerTest {
     private TransportWebSocketHandler handler;
 
     private TestWebSocketSession socketSession = new TestWebSocketSession();
+    private TestWebSocketSession socketSubSession = new TestWebSocketSession();
 
     @Before
     public void setUp() throws Exception {
@@ -44,23 +47,27 @@ public class TransportWebSocketHandlerTest {
         socketSession.setId("123");
         socketSession.setOpen(true);
 
+        socketSubSession.setId("456");
+        socketSubSession.setOpen(true);
+
         handler.afterConnectionEstablished(socketSession);
+        handler.afterConnectionEstablished(socketSubSession);
     }
 
     @Test
-    public void handleNotificationNotSubscribe() throws Exception {
-        Message<JsonRpcNotification> build = notification(null, "method");
+    public void handleMessageWithoutSubscribe() throws Exception {
+        Message<JsonRpcNotification> build = notification(null, "method", "123");
         handler.handleMessage(build);
 
-        assertTrue(socketSession.getSentMessages().size() == 0);
+        assertEquals(socketSession.getSentMessages().size(), 1);
     }
 
     @Test
     public void handleNotificationSubscribe() throws Exception {
-        Message<JsonRpcNotification> notification = notification("method", null);
+        Message<JsonRpcNotification> notification = notification("method", null, "123");
         handler.handleMessage(notification);
 
-        Message<JsonRpcNotification> notificationMessage = notification(null, "method");
+        Message<JsonRpcNotification> notificationMessage = notification(null, "method", "123");
         handler.handleMessage(notificationMessage);
 
         assertEquals(socketSession.getSentMessages().size(), 2);
@@ -68,7 +75,7 @@ public class TransportWebSocketHandlerTest {
 
     @Test
     public void handleMethodResult() throws Exception {
-        Message<JsonRpcNotification> notification = notification(null, null);
+        Message<JsonRpcNotification> notification = notification(null, null, "123");
         handler.handleMessage(notification);
 
         assertEquals(socketSession.getSentMessages().size(), 1);
@@ -138,12 +145,44 @@ public class TransportWebSocketHandlerTest {
         assertEquals(response.getResult(), "string");
     }
 
-    private Message<JsonRpcNotification> notification(String subscribe, String sendMethod) {
+    @Test
+    public void notSendByBroadcastIfNotSubscribe() throws Exception {
+        Message<JsonRpcNotification> notification = notification("subscribe", "method", "123");
+        handler.handleMessage(notification);
+
+        Message<JsonRpcNotification> notificationBroadcast
+                = notification(null, "subscribe", null);
+        handler.handleMessage(notificationBroadcast);
+
+        assertEquals(socketSession.getSentMessages().size(), 2);
+        assertEquals(socketSubSession.getSentMessages().size(), 0);
+    }
+
+    @Test
+    public void removeFromSubscribersAfterCloseConnection() throws Exception {
+        Message<JsonRpcNotification> notification1
+                = notification("subscribe", "subscribe", "123");
+        Message<JsonRpcNotification> notification2
+                = notification("subscribe", "subscribe", "456");
+
+        handler.handleMessage(notification1);
+        handler.handleMessage(notification2);
+
+        handler.afterConnectionClosed(socketSession, CloseStatus.BAD_DATA);
+
+        Message<JsonRpcNotification> notification = notification(null, "subscribe", null);
+        handler.handleMessage(notification);
+
+        assertEquals(socketSession.getSentMessages().size(), 1);
+        assertEquals(socketSubSession.getSentMessages().size(), 2);
+    }
+
+    private Message<JsonRpcNotification> notification(String subscribe, String sendMethod, String sessionId) {
         JsonRpcNotification notification = new JsonRpcNotification("method", null);
         MessageHeaderAccessor accessor = MessageHeaderAccessor.ofHeaders(null);
         accessor.setSendMessageMethod(sendMethod);
         accessor.setMessageMethod("method");
-        accessor.setSessionId("123");
+        accessor.setSessionId(sessionId);
         if (subscribe != null) {
             accessor.setSubscribeName(subscribe);
         }
