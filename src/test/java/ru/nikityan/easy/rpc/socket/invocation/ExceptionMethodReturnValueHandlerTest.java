@@ -22,7 +22,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
 /**
- * Created by Nikit on 03.10.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class ExceptionMethodReturnValueHandlerTest {
 

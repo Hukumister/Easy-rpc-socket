@@ -31,7 +31,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by Nikit on 29.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class JsonRpcAnnotationMessageHandlerTest {
 

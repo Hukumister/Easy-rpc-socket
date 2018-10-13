@@ -9,7 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by Nikit on 26.08.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class ArgumentResolverComposite implements ArgumentResolver {
 

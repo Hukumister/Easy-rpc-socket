@@ -14,7 +14,8 @@ import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcRequest;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Nikit on 02.10.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class JsonRpcIncomingConverterTest {
 

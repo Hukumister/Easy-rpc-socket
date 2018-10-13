@@ -13,7 +13,8 @@ import java.net.SocketException;
 import static org.junit.Assert.*;
 
 /**
- * Created by Nikit on 03.10.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class AnnotationExceptionHandlerMethodResolverTest {
 

@@ -8,7 +8,8 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Nikit on 26.08.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class MessageHeadersTest {
 

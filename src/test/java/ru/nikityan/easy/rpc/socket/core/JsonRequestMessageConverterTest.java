@@ -17,7 +17,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 /**
- * Created by Nikit on 29.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class JsonRequestMessageConverterTest {
 

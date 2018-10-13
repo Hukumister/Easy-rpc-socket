@@ -22,7 +22,8 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 /**
- * Created by Nikit on 17.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class ParamArgumentResolverTest {
 
