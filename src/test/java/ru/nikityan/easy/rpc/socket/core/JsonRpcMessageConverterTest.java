@@ -15,7 +15,8 @@ import ru.nikityan.easy.rpc.socket.support.MessageHeaderAccessor;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Nikit on 01.10.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class JsonRpcMessageConverterTest {
 
@@ -56,14 +57,15 @@ public class JsonRpcMessageConverterTest {
         String result = "result";
 
         MessageHeaderAccessor accessor = MessageHeaderAccessor.ofHeaders(null);
-        accessor.setMessageMethod("message");
         accessor.setMessageType(MessageType.NOTIFICATION);
 
-        Message<?> message = converter.toMessage(result, accessor.getMessageHeaders());
+        Message<?> message = converter.toMessage(result, accessor.getMessageHeaders(), "message");
         JsonRpcNotification notification = (JsonRpcNotification) message.getPayload();
 
         assertEquals(notification.getParams(), "result");
+        assertEquals(notification.getMethod(), "message");
     }
+
 
     @Test
     public void withoutHeader() throws Exception {

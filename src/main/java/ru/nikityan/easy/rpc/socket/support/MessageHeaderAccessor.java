@@ -23,7 +23,7 @@ public class MessageHeaderAccessor {
 
     /**
      * The name of subscribe method, this field use for method with {@link ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Subscribe}
-     * this field is bound to convertAndSend notification
+     * this field is bound to send notification
      */
     public final static String SUBSCRIBE_METHOD = "subscribeMethodName";
 
@@ -87,7 +87,7 @@ public class MessageHeaderAccessor {
     }
 
     /**
-     * @return message convertAndSend message method method from message headers
+     * @return message send message method method from message headers
      */
     @Nullable
     public static String getSendMessageMethod(MessageHeaders messageHeaders) {

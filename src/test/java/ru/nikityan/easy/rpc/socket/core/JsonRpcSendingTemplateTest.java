@@ -4,9 +4,8 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -15,6 +14,7 @@ import ru.nikityan.easy.rpc.socket.MessageChannel;
 import ru.nikityan.easy.rpc.socket.MessageHeaders;
 import ru.nikityan.easy.rpc.socket.MessageType;
 import ru.nikityan.easy.rpc.socket.exceptions.MessageSendException;
+import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcNotification;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 import ru.nikityan.easy.rpc.socket.support.MessageHeaderAccessor;
 
@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
@@ -31,7 +32,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by Nikit on 01.10.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class JsonRpcSendingTemplateTest {
 
@@ -96,13 +98,14 @@ public class JsonRpcSendingTemplateTest {
 
         verify(messageChannel).send(argThat(messageHeaderMatcher(messageHeaders ->
                 Objects.equals(MessageHeaderAccessor.getMessageMethod(messageHeaders), "method")
+                        && Objects.nonNull(MessageHeaderAccessor.getSendMessageMethod(messageHeaders))
                         && messageHeaders.getMessageType() == MessageType.NOTIFICATION)));
     }
 
     @Test
     public void convertAndSendWithPostProcessor() throws Exception {
         AtomicBoolean atomicBoolean = new AtomicBoolean(false);
-        sendingTemplate.send("method", "result", message -> {
+        sendingTemplate.convertAndSend("method", "result", message -> {
             atomicBoolean.set(true);
             return message;
         });
@@ -110,6 +113,7 @@ public class JsonRpcSendingTemplateTest {
         assertTrue(atomicBoolean.get());
         verify(messageChannel).send(argThat(messageHeaderMatcher(messageHeaders ->
                 Objects.equals(MessageHeaderAccessor.getMessageMethod(messageHeaders), "method")
+                        && Objects.nonNull(MessageHeaderAccessor.getSendMessageMethod(messageHeaders))
                         && messageHeaders.getMessageType() == MessageType.NOTIFICATION)));
     }
 
@@ -122,8 +126,42 @@ public class JsonRpcSendingTemplateTest {
         sendingTemplate.convertAndSend("method", "result", headers);
         verify(messageChannel).send(argThat(messageHeaderMatcher(messageHeaders ->
                 Objects.equals(MessageHeaderAccessor.getMessageMethod(messageHeaders), "method")
+                        && Objects.nonNull(MessageHeaderAccessor.getSendMessageMethod(messageHeaders))
                         && messageHeaders.getMessageType() == MessageType.NOTIFICATION &&
                         messageHeaders.containsKey("foo") && messageHeaders.containsKey("bar"))));
+    }
+
+    @Test
+    public void sendCorrectNotificationMessage() throws Exception {
+        sendingTemplate.convertAndSend("subscribe", "ok");
+        ArgumentCaptor<Message> argumentCaptor = ArgumentCaptor.forClass(Message.class);
+
+        verify(messageChannel).send(argumentCaptor.capture());
+        Message argumentCaptorValue = argumentCaptor.getValue();
+
+        JsonRpcNotification notification = (JsonRpcNotification) argumentCaptorValue.getPayload();
+        assertNotNull(notification.getMethod());
+        assertNotNull(notification.getParams());
+    }
+
+    @Test
+    public void sendCorrectNotificationMessageWithPostProcessor() throws Exception {
+        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+        sendingTemplate.convertAndSend("subscribe", "ok", message -> {
+            atomicBoolean.set(true);
+            return message;
+        });
+        ArgumentCaptor<Message> argumentCaptor = ArgumentCaptor.forClass(Message.class);
+
+        verify(messageChannel).send(argumentCaptor.capture());
+        Message argumentCaptorValue = argumentCaptor.getValue();
+
+        JsonRpcNotification notification = (JsonRpcNotification) argumentCaptorValue.getPayload();
+
+        assertNotNull(notification.getMethod());
+        assertNotNull(notification.getParams());
+
+        assertTrue(atomicBoolean.get());
     }
 
     private Matcher<Message<?>> messageHeaderMatcher(Function<MessageHeaders, Boolean> function) {
