@@ -17,12 +17,13 @@ import ru.nikityan.easy.rpc.socket.TestWebSocketSession;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 import ru.nikityan.easy.rpc.socket.support.MessageHeaderAccessor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
 /**
- * Created by Nikit on 02.10.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class TransportWebSocketHandlerTest {
 
@@ -52,6 +53,20 @@ public class TransportWebSocketHandlerTest {
 
         handler.afterConnectionEstablished(socketSession);
         handler.afterConnectionEstablished(socketSubSession);
+    }
+
+    @Test
+    public void validateJsonOnInput() throws Exception {
+        String noParse = "{\"method\": \"subscribe\", \"params\": {\"name:456}, \"id\": 123}";
+        TextMessage message = new TextMessage(noParse);
+
+        handler.handleMessage(socketSession, message);
+
+        WebSocketMessage<?> socketMessage = socketSession.getSentMessages().get(0);
+        String payload = (String) socketMessage.getPayload();
+        JsonRpcResponse response = gson.fromJson(payload, JsonRpcResponse.class);
+
+        assertNotNull(response.getError());
     }
 
     @Test
@@ -175,6 +190,48 @@ public class TransportWebSocketHandlerTest {
 
         assertEquals(socketSession.getSentMessages().size(), 1);
         assertEquals(socketSubSession.getSentMessages().size(), 2);
+    }
+
+    @Test
+    public void notConvertMessageToResponseUseBroadcast() throws Exception {
+        Message<JsonRpcNotification> subscribe
+                = notification("method", "method", "123");
+        handler.handleMessage(subscribe);
+
+        Message<JsonRpcNotification> notification
+                = notification(null, "method", null);
+        handler.handleMessage(notification);
+
+        WebSocketMessage<?> webSocketMessage = socketSession.getSentMessages().get(1);
+        String payload = (String) webSocketMessage.getPayload();
+
+        assertFalse(payload.contains("\"id\":-1"));
+        JsonRpcNotification result = gson.fromJson(payload, JsonRpcNotification.class);
+
+        assertEquals(result.getMethod(), "method");
+    }
+
+
+    @Test
+    public void ifRequestMessageMethodContainInSubscribersUnsubscribe() throws Exception {
+        Message<JsonRpcNotification> subscribe
+                = notification("method", "method", "123");
+        handler.handleMessage(subscribe);
+
+        JsonRpcRequest rpcRequest = new JsonRpcRequest(1L, "method", null);
+        String json = gson.toJson(rpcRequest);
+        TextMessage message = new TextMessage(json);
+
+        handler.handleMessage(socketSession, message);
+        handler.handleMessage(socketSession, message);
+        verify(outChanel).send(any());
+
+        WebSocketMessage<?> webSocketMessage = socketSession.getSentMessages().get(1);
+        String payload = (String) webSocketMessage.getPayload();
+        JsonRpcResponse response = gson.fromJson(payload, JsonRpcResponse.class);
+
+        assertNull(response.getError());
+        assertNull(response.getResult());
     }
 
     private Message<JsonRpcNotification> notification(String subscribe, String sendMethod, String sessionId) {

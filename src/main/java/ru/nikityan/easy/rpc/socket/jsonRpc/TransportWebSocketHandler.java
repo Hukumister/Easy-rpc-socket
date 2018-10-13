@@ -28,7 +28,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
 /**
- * Created by Nikit on 02.10.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class TransportWebSocketHandler extends AbstractWebSocketHandler implements MessageHandler, SmartLifecycle {
 
@@ -68,7 +69,7 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
 
     @Override
     public boolean isAutoStartup() {
-        return false;
+        return true;
     }
 
     @Override
@@ -139,6 +140,12 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
             sendMessage = MessageBuilder.fromMessage(sendMessage)
                     .withHeaders(accessor.getMessageHeaders())
                     .build();
+
+            boolean alreadySubscribe = verifySubscribe(session, sendMessage);
+            if (alreadySubscribe) {
+                unsubscribeAndSend(session, sendMessage);
+                return;
+            }
             boolean result = this.clientOutboundChannel.send(sendMessage);
             if (!result) {
                 logger.warn("Fail sent message to message chanel message = {}", message);
@@ -146,6 +153,19 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
         } catch (JsonRequestException ex) {
             handleFailRequest(session, ex);
         }
+    }
+
+    private void unsubscribeAndSend(WebSocketSession session, Message<?> sendMessage) {
+        String messageMethod = MessageHeaderAccessor.getMessageMethod(sendMessage.getMessageHeader());
+        subscribers.get(messageMethod).remove(session.getId());
+        JsonRpcResponse rpcResponse = new JsonRpcResponse(sendMessage.getMessageHeader().getId(), null);
+        Message<JsonRpcResponse> responseMessage = MessageBuilder.fromPayload(rpcResponse).build();
+        sendMessage(session, responseMessage);
+    }
+
+    private boolean verifySubscribe(WebSocketSession session, Message<?> sendMessage) {
+        String messageMethod = MessageHeaderAccessor.getMessageMethod(sendMessage.getMessageHeader());
+        return subscribers.containsKey(messageMethod) && subscribers.get(messageMethod).contains(session.getId());
     }
 
     @Override
@@ -222,6 +242,42 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
         sendMessage(session, message);
     }
 
+    private void broadCastMessage(String method, Message<?> message) {
+        Set<String> ids = subscribers.get(method);
+        if (ids == null || ids.isEmpty()) {
+            logger.debug("Subscribe set is empty");
+            return;
+        }
+        List<WebSocketSession> socketSessions = ids.stream()
+                .map(sessions::get)
+                .collect(Collectors.toList());
+        if (socketSessions == null) {
+            logger.debug("Session set is null");
+            return;
+        }
+        for (WebSocketSession socketSession : socketSessions) {
+            broadcast(socketSession, message);
+        }
+    }
+
+    private void broadcast(WebSocketSession socketSession, Message<?> message) {
+        JsonRpcNotification rpcNotification;
+        Object payload = message.getPayload();
+        if (payload instanceof JsonRpcNotification) {
+            rpcNotification = (JsonRpcNotification) payload;
+        } else {
+            String sendMessageMethod = MessageHeaderAccessor.getSendMessageMethod(message.getMessageHeader());
+            rpcNotification = new JsonRpcNotification(sendMessageMethod, payload);
+        }
+        String json = gson.toJson(rpcNotification);
+        try {
+            TextMessage textMessage = new TextMessage(json);
+            socketSession.sendMessage(textMessage);
+        } catch (IOException ex) {
+            logger.warn("Error while try to convertAndSend text message session = {}, message = {}", socketSession, message);
+        }
+    }
+
     private void sendMessage(WebSocketSession socketSession, Message<?> message) {
         JsonRpcResponse rpcResponse;
         Object payload = message.getPayload();
@@ -236,21 +292,7 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
             TextMessage textMessage = new TextMessage(json);
             socketSession.sendMessage(textMessage);
         } catch (IOException ex) {
-            logger.warn("Error while try to send text message session = {}, message = {}", socketSession, message);
-        }
-    }
-
-    private void broadCastMessage(String method, Message<?> message) {
-        Set<String> ids = subscribers.get(method);
-        List<WebSocketSession> socketSessions = ids.stream()
-                .map(sessions::get)
-                .collect(Collectors.toList());
-        if (socketSessions == null) {
-            logger.debug("Session set is null");
-            return;
-        }
-        for (WebSocketSession socketSession : socketSessions) {
-            sendMessage(socketSession, message);
+            logger.warn("Error while try to convertAndSend text message session = {}, message = {}", socketSession, message);
         }
     }
 }
