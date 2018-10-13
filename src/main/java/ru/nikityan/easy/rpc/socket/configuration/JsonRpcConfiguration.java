@@ -14,7 +14,6 @@ import ru.nikityan.easy.rpc.socket.support.ExecutorSubscribableChannel;
  * All necessary bins for the library.
  */
 @Configuration
-@Import(WebSocketConfig.class)
 public class JsonRpcConfiguration {
 
     @Bean
