@@ -13,7 +13,10 @@ import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcResponse;
 import java.util.Map;
 
 /**
- * Created by Nikit on 25.08.2018.
+ * This class allows method for create instance of messages.
+ *
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public final class MessageBuilder<T> {
 
@@ -31,21 +34,43 @@ public final class MessageBuilder<T> {
         this.payload = originalMessage.getPayload();
     }
 
+    /**
+     * Create message builder from other message with its headers.
+     *
+     * @param <T> type of original message.
+     * @return instance of messageB builder.
+     */
     @NotNull
     public static <T> MessageBuilder<T> fromMessage(Message<T> originalMessage) {
         return new MessageBuilder<>(originalMessage);
     }
 
+    /**
+     * Create message builder from payload.
+     *
+     * @param <T> type of payload.
+     * @return instance of messageB builder.
+     */
     @NotNull
     public static <T> MessageBuilder<T> fromPayload(T payload) {
         return new MessageBuilder<>(payload);
     }
 
+    /**
+     * Set message  headers.
+     *
+     * @return instance of message builder.
+     */
     public MessageBuilder<T> withHeaders(Map<String, Object> messageHeaders) {
         this.headers = messageHeaders;
         return this;
     }
 
+    /**
+     * Create message.
+     *
+     * @return instance of message. {@link Message}
+     */
     @SuppressWarnings("unchecked")
     public Message<T> build() {
         Assert.notNull(payload, "Payload must not be null");

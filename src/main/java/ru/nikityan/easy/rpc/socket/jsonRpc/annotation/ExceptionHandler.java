@@ -6,9 +6,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 
+/**
+ * This annotation marks a method that will catch exceptions thrown in the controller.
+ *
+ * @author CodeRedWolf
+ * @since 1.0
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExceptionHandler {
 
+    /**
+     * Interception exception class.
+     */
     Class<? extends Throwable>[] value() default {};
 }

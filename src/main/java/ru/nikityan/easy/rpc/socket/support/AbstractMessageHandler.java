@@ -21,8 +21,6 @@ import ru.nikityan.easy.rpc.socket.handler.resolvers.ArgumentResolver;
 import ru.nikityan.easy.rpc.socket.handler.resolvers.ArgumentResolverComposite;
 import ru.nikityan.easy.rpc.socket.invocation.HandlerMethodReturnValueHandler;
 import ru.nikityan.easy.rpc.socket.invocation.HandlerMethodReturnValueHandlerComposite;
-import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcError;
-import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcResponse;
 
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
@@ -31,7 +29,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by Nikit on 26.08.2018.
+ * Abstract base class for HandlerMethod-based message handling. Provides most of
+ * the logic required to discover handler methods at startup, find a matching handler
+ * method at runtime for a given message and invoke it.
+ *
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public abstract class AbstractMessageHandler implements MessageHandler, ApplicationContextAware, InitializingBean {
 
@@ -84,6 +87,9 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
         }
     }
 
+    /**
+     * @return list of HandlerMethodReturnValueHandler
+     */
     protected abstract List<HandlerMethodReturnValueHandler> initMethodReturnValue();
 
     @Override
@@ -91,6 +97,12 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
         this.applicationContext = applicationContext;
     }
 
+    /**
+     * Handle incoming message.
+     *
+     * @param message the message to be handled
+     * @throws MessagingException if fail handle message.
+     */
     @Override
     public void handleMessage(Message<?> message) throws MessagingException {
         String destination = getDestination(message);
@@ -106,14 +118,56 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
         return this.applicationContext;
     }
 
+    /**
+     * Provide the mapping for a handler method.
+     *
+     * @param method   the method for which is being created destination.
+     * @param userType handler class.
+     */
     protected abstract String getMappingForMethod(Method method, Class<?> userType);
 
+    /**
+     * @return list of argument resolver for specific handler.
+     */
     protected abstract List<? extends ArgumentResolver> initArgumentResolvers();
 
+    /**
+     * @param beanType instance of class.
+     * @return true if class is handler, false if not.
+     */
     protected abstract boolean isHandler(Class<?> beanType);
 
+    /**
+     * Find destination for input message.
+     *
+     * @param message given message.
+     * @return describe of destination.
+     */
     protected abstract String getDestination(Message<?> message);
 
+    /**
+     * Create exception handler for given handler class.
+     */
+    protected abstract AbstractExceptionHandlerMethodResolver createExceptionHandlerMethodResolverFor(Class<?> beanType);
+
+    /**
+     * Handle request method for which not found handler.
+     *
+     * @param message     request massage.
+     * @param destination the destination request.
+     */
+    protected abstract void handleNotFoundMethod(Message<?> message, String destination);
+
+    /**
+     * Handle unexpected exception.
+     *
+     * @param message request message.
+     */
+    protected abstract void handleDefaultError(Exception exception, Message<?> message);
+
+    /**
+     * Handle request message.
+     */
     protected void handleMatch(HandlerMethod handlerMethod, String destination, Message<?> message) {
         logger.debug("Invoking {}", handlerMethod.getShortLogMessage());
         handlerMethod = handlerMethod.createWithResolvedBean();
@@ -128,6 +182,12 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
         }
     }
 
+    /**
+     * Handle unexpected exception.
+     *
+     * @param handlerMethod exception method handler.
+     * @param message       request message.
+     */
     protected void processHandlerMethodException(HandlerMethod handlerMethod, Exception exception, Message<?> message) {
         InvocableHandlerMethod invocable = getExceptionHandlerMethod(handlerMethod, exception);
         if (invocable == null) {
@@ -148,24 +208,6 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
         }
     }
 
-    protected abstract void handleDefaultError(Exception exception, Message<?> message);
-
-    private InvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod handlerMethod, Exception exception) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Searching methods to handle " + exception.getClass().getSimpleName());
-        }
-        Class<?> beanType = handlerMethod.getBeanType();
-        AbstractExceptionHandlerMethodResolver resolver = this.exceptionHandlerCache
-                .computeIfAbsent(beanType, key -> createExceptionHandlerMethodResolverFor(beanType));
-        Method method = resolver.resolveMethod(exception);
-        if (method != null) {
-            return new InvocableHandlerMethod(handlerMethod.getBean(), method);
-        }
-        return null;
-    }
-
-    protected abstract AbstractExceptionHandlerMethodResolver createExceptionHandlerMethodResolverFor(Class<?> beanType);
-
     protected void handleMessageInternal(Message<?> message, String destination) {
         HandlerMethod handlerMethod = this.handlerMethods.get(destination);
         if (handlerMethod == null) {
@@ -175,8 +217,6 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
         logger.debug("Invoking {}", handlerMethod.getShortLogMessage());
         handleMatch(handlerMethod, destination, message);
     }
-
-    protected abstract void handleNotFoundMethod(Message<?> message, String destination);
 
     protected void resolveHandlerMethods(Object handler) {
         Class<?> handlerType;
@@ -213,6 +253,20 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
 
         this.handlerMethods.put(mapping, newHandlerMethod);
         logger.debug("Mapped \"{}\", onto {}", mapping, newHandlerMethod);
+    }
+
+    private InvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod handlerMethod, Exception exception) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Searching methods to handle " + exception.getClass().getSimpleName());
+        }
+        Class<?> beanType = handlerMethod.getBeanType();
+        AbstractExceptionHandlerMethodResolver resolver = this.exceptionHandlerCache
+                .computeIfAbsent(beanType, key -> createExceptionHandlerMethodResolverFor(beanType));
+        Method method = resolver.resolveMethod(exception);
+        if (method != null) {
+            return new InvocableHandlerMethod(handlerMethod.getBean(), method);
+        }
+        return null;
     }
 
     protected HandlerMethod createHandlerMethod(Object handler, Method method) {

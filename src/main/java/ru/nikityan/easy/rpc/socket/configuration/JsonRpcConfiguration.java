@@ -10,6 +10,9 @@ import ru.nikityan.easy.rpc.socket.jsonRpc.TransportWebSocketHandler;
 import ru.nikityan.easy.rpc.socket.support.AbstractSubscribeChannel;
 import ru.nikityan.easy.rpc.socket.support.ExecutorSubscribableChannel;
 
+/**
+ * All necessary bins for the library.
+ */
 @Configuration
 @Import(WebSocketConfig.class)
 public class JsonRpcConfiguration {

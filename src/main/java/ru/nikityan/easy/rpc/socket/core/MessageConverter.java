@@ -8,10 +8,24 @@ import ru.nikityan.easy.rpc.socket.MessageHeaders;
  */
 public interface MessageConverter {
 
+    /**
+     * @param message
+     * @param targetClass
+     * @return
+     */
     Object fromMessage(Message<?> message, Class<?> targetClass);
 
+    /**
+     * @param payload
+     * @param headers
+     * @return
+     */
     Message<?> toMessage(Object payload, MessageHeaders headers);
 
+    /**
+     * @param payload
+     * @return
+     */
     default Message<?> toMessage(Object payload) {
         return toMessage(payload, null);
     }

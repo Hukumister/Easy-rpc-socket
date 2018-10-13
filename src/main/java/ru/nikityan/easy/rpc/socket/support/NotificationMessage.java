@@ -12,7 +12,7 @@ public class NotificationMessage extends GenericMessage<JsonRpcNotification> {
     private final JsonRpcNotification notification;
 
     /**
-     * Create notification message from request {@link NotificationMessage}
+     * Create notification message from notification {@link NotificationMessage}
      * and message headers {@link MessageHeaders}.
      *
      * @param notification   given notification object.

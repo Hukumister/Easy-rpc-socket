@@ -11,8 +11,10 @@ import java.lang.annotation.Target;
  * Indicates that an annotated class is a "Controller" use protocol JsonRpc
  * This annotation marks the class that is the jsonrpc controller.
  * This jsonrpc controller processes requests via the Json Rpc protocol
+ * <p>
  *
- * @see Component
+ * @author CodeRedWolf
+ * @since 1.0
  */
 @Target(ElementType.TYPE)
 @Component

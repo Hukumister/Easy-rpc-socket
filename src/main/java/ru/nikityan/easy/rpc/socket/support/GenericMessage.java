@@ -6,7 +6,10 @@ import ru.nikityan.easy.rpc.socket.MessageHeaders;
 import java.util.Map;
 
 /**
- * Created by Nikit on 25.08.2018.
+ * This class describe generic message.
+ *
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class GenericMessage<T> implements Message<T> {
 
@@ -14,6 +17,9 @@ public class GenericMessage<T> implements Message<T> {
 
     private final MessageHeaders messageHeaders;
 
+    /**
+     * Constructor for genericMessage with given payload and headers.
+     */
     public GenericMessage(T payload, Map<String, Object> messageHeaders) {
         this.payload = payload;
         this.messageHeaders = new MessageHeaders(messageHeaders);

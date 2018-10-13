@@ -7,20 +7,34 @@ import ru.nikityan.easy.rpc.socket.exceptions.MessageSendException;
 import java.util.concurrent.Executor;
 
 /**
- * Created by Nikit on 25.08.2018.
+ * This class describe implementation of channel.
+ *
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class ExecutorSubscribableChannel extends AbstractSubscribeChannel {
 
     private final Executor executor;
 
+    /**
+     * Constructor without executor.
+     */
     public ExecutorSubscribableChannel() {
         this(null);
     }
 
+    /**
+     * Constructor without executor with given executor.
+     */
     public ExecutorSubscribableChannel(Executor executor) {
         this.executor = executor;
     }
 
+    /**
+     * Send message to channel, all subscribers handle this message.
+     *
+     * @param message given message.
+     */
     @Override
     public boolean sendMessage(Message<?> message) {
         for (MessageHandler messageHandler : getSubscribers()) {

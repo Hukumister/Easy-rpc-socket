@@ -21,10 +21,20 @@ public class MessageHeaderAccessor {
      */
     public final static String SESSION_ID = "sessionId";
 
+    /**
+     * The name of subscribe method, this field use for method with {@link ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Subscribe}
+     * this field is bound to send notification
+     */
     public final static String SUBSCRIBE_METHOD = "subscribeMethodName";
 
+    /**
+     * The name of method to be accessed from the request
+     */
     public final static String MESSAGE_METHOD = "messageMethod";
 
+    /**
+     * Name of message that user for notification
+     */
     public final static String SEND_MESSAGE_METHOD = "sendMessageMethod";
 
     private final MuttableHeaders messageHeaders;
@@ -37,15 +47,24 @@ public class MessageHeaderAccessor {
         this.messageHeaders = new MuttableHeaders(message.getMessageHeader());
     }
 
+    /**
+     * @return instance from message headers
+     */
     public static MessageHeaderAccessor ofHeaders(MessageHeaders messageHeaders) {
         return new MessageHeaderAccessor(messageHeaders);
     }
 
+    /**
+     * @return instance from message method
+     */
     public static MessageHeaderAccessor ofMessage(Message<?> message) {
         Assert.notNull(message, "message required");
         return new MessageHeaderAccessor(message);
     }
 
+    /**
+     * @return subscribe method from message headers
+     */
     @Nullable
     public static String getSubscribeMethod(MessageHeaders messageHeaders) {
         Object subscribeName = messageHeaders.get(SUBSCRIBE_METHOD);
@@ -55,6 +74,9 @@ public class MessageHeaderAccessor {
         return null;
     }
 
+    /**
+     * @return message method method from message headers
+     */
     @Nullable
     public static String getMessageMethod(MessageHeaders messageHeaders) {
         Object messageMethod = messageHeaders.get(MESSAGE_METHOD);
@@ -64,6 +86,9 @@ public class MessageHeaderAccessor {
         return null;
     }
 
+    /**
+     * @return message send message method method from message headers
+     */
     @Nullable
     public static String getSendMessageMethod(MessageHeaders messageHeaders) {
         Object messageMethod = messageHeaders.get(SEND_MESSAGE_METHOD);
@@ -73,6 +98,9 @@ public class MessageHeaderAccessor {
         return null;
     }
 
+    /**
+     * @return session id from message headers
+     */
     @Nullable
     public static String getSessionId(MessageHeaders messageHeaders) {
         Object messageMethod = messageHeaders.get(SESSION_ID);
@@ -149,11 +177,11 @@ public class MessageHeaderAccessor {
 
         private boolean muttable = true;
 
-        public MuttableHeaders(Map<String, Object> headers) {
+        private MuttableHeaders(Map<String, Object> headers) {
             super(headers);
         }
 
-        public void setImuttable() {
+        private void setImuttable() {
             this.muttable = false;
         }
 

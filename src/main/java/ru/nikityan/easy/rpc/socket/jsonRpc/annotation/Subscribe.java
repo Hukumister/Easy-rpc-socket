@@ -13,7 +13,9 @@ import java.lang.annotation.Target;
  * Warning the method must have two parameters, the first is the argument for the method and
  * the second is necessarily the object class WebSocketSession
  *
+ * @author CodeRedWolf
  * @see WebSocketSession
+ * @since 1.0
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
