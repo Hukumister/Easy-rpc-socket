@@ -5,9 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.nikityan.easy.rpc.socket.Message;
 import ru.nikityan.easy.rpc.socket.MessageHeaders;
+import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcError;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcRequest;
 import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcResponse;
-import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcError;
 import ru.nikityan.easy.rpc.socket.support.ListMapTypeAdapter;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 import ru.nikityan.easy.rpc.socket.support.RequestMessage;
@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Nikit on 29.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class JsonRequestMessageConverter implements SmartMessageConverter {
 

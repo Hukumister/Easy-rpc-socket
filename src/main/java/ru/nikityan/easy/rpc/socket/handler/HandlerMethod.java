@@ -15,7 +15,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
- * Created by Nikit on 26.08.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class HandlerMethod {
 
@@ -140,6 +141,14 @@ public class HandlerMethod {
      */
     public MethodParameter getReturnType() {
         return new HandlerMethodParameter(-1);
+    }
+
+
+    @Override
+    public String toString() {
+        return "HandlerMethod{" +
+                "method=" + method.getName() +
+                '}';
     }
 
     /**

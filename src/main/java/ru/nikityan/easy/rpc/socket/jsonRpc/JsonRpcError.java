@@ -2,6 +2,10 @@ package ru.nikityan.easy.rpc.socket.jsonRpc;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @author CodeRedWolf
+ * @since 1.0
+ */
 public class JsonRpcError {
     /**
      * Json rpc code error

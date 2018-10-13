@@ -29,7 +29,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by Nikit on 15.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class JsonRpcAnnotationMessageHandler extends AbstractMessageHandler implements SmartLifecycle {
 

@@ -1,5 +1,9 @@
 package ru.nikityan.easy.rpc.socket.jsonRpc;
 
+/**
+ * @author CodeRedWolf
+ * @since 1.0
+ */
 public class JsonRpcNotification {
     /**
      * Method name

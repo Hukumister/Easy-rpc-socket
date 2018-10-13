@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Nikit on 26.08.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public abstract class AbstractExceptionHandlerMethodResolver {
 

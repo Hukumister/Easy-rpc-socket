@@ -2,7 +2,10 @@ package ru.nikityan.easy.rpc.socket.jsonRpc;
 
 import com.google.gson.JsonElement;
 
-
+/**
+ * @author CodeRedWolf
+ * @since 1.0
+ */
 public class JsonRpcRequest {
     /**
      * Identificator of message
