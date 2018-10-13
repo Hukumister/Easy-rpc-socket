@@ -14,7 +14,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
- * Created by Nikit on 27.08.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class InvocableHandlerMethod extends HandlerMethod {
 
@@ -52,25 +53,20 @@ public class InvocableHandlerMethod extends HandlerMethod {
         ReflectionUtils.makeAccessible(getBridgedMethod());
         try {
             return getBridgedMethod().invoke(getBean(), args);
-        }
-        catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             assertTargetBean(getBridgedMethod(), getBean(), args);
             String text = (ex.getMessage() != null ? ex.getMessage() : "Illegal argument");
             throw new IllegalStateException(getInvocationErrorMessage(text, args), ex);
-        }
-        catch (InvocationTargetException ex) {
+        } catch (InvocationTargetException ex) {
             // Unwrap for HandlerExceptionResolvers ...
             Throwable targetException = ex.getTargetException();
             if (targetException instanceof RuntimeException) {
                 throw (RuntimeException) targetException;
-            }
-            else if (targetException instanceof Error) {
+            } else if (targetException instanceof Error) {
                 throw (Error) targetException;
-            }
-            else if (targetException instanceof Exception) {
+            } else if (targetException instanceof Exception) {
                 throw (Exception) targetException;
-            }
-            else {
+            } else {
                 String text = getInvocationErrorMessage("Failed to invoke handler method", args);
                 throw new IllegalStateException(text, targetException);
             }
@@ -123,8 +119,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
             sb.append("[").append(i).append("] ");
             if (resolvedArgs[i] == null) {
                 sb.append("[null] \n");
-            }
-            else {
+            } else {
                 sb.append("[type=").append(resolvedArgs[i].getClass().getName()).append("] ");
                 sb.append("[value=").append(resolvedArgs[i]).append("]\n");
             }
@@ -134,6 +129,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 
     /**
      * Adds HandlerMethod details such as the bean type and method signature to the message.
+     *
      * @param text error message to append the HandlerMethod details to
      */
     protected String getDetailedErrorMessage(String text) {

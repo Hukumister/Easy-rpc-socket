@@ -5,7 +5,9 @@ import ru.nikityan.easy.rpc.socket.Message;
 import ru.nikityan.easy.rpc.socket.MessageHeaders;
 
 /**
- * Created by Nikit on 30.09.2018.
+ *
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public interface SmartMessageConverter extends MessageConverter {
 

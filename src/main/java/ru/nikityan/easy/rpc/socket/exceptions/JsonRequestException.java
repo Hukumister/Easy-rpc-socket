@@ -6,6 +6,9 @@ import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcRequest;
 
 /**
  * Exception used in jsonrpc protocol.
+ *
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class JsonRequestException extends RuntimeException {
     /**

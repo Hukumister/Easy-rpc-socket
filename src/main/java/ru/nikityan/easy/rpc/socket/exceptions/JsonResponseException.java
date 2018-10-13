@@ -6,6 +6,9 @@ import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcError;
 /**
  * Exception used in jsonrpc protocol.
  * Use for response when subscribe
+ *
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class JsonResponseException extends Exception {
 

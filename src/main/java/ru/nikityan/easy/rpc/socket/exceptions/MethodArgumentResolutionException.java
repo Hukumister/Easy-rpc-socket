@@ -4,7 +4,8 @@ import org.springframework.core.MethodParameter;
 import ru.nikityan.easy.rpc.socket.Message;
 
 /**
- * Created by Nikit on 27.08.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class MethodArgumentResolutionException extends MessageSendException {
 

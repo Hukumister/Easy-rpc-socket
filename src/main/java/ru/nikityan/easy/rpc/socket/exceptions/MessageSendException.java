@@ -3,7 +3,10 @@ package ru.nikityan.easy.rpc.socket.exceptions;
 import ru.nikityan.easy.rpc.socket.Message;
 
 /**
- * Created by Nikit on 24.08.2018.
+ * Throw this exception if fail send message.
+ *
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class MessageSendException extends MessagingException {
 
