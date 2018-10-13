@@ -274,7 +274,7 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
             TextMessage textMessage = new TextMessage(json);
             socketSession.sendMessage(textMessage);
         } catch (IOException ex) {
-            logger.warn("Error while try to convertAndSend text message session = {}, message = {}", socketSession, message);
+            logger.warn("Error while try to send text message session = {}, message = {}", socketSession, message);
         }
     }
 
@@ -292,7 +292,7 @@ public class TransportWebSocketHandler extends AbstractWebSocketHandler implemen
             TextMessage textMessage = new TextMessage(json);
             socketSession.sendMessage(textMessage);
         } catch (IOException ex) {
-            logger.warn("Error while try to convertAndSend text message session = {}, message = {}", socketSession, message);
+            logger.warn("Error while try to send text message session = {}, message = {}", socketSession, message);
         }
     }
 }

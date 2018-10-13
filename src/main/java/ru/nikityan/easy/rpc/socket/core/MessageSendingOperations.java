@@ -21,7 +21,7 @@ public interface MessageSendingOperations {
      * @param message incoming message.
      * @throws MessagingException if fail to send message.
      */
-    void convertAndSend(Message<?> message) throws MessagingException;
+    void send(Message<?> message) throws MessagingException;
 
     /**
      * Send incoming message for all subscribers by method (destination).
@@ -30,14 +30,14 @@ public interface MessageSendingOperations {
      * @param message     given message. Use the method with care so all necessary headers may not be initialized.
      * @throws MessagingException if fail to send message.
      */
-    void convertAndSend(String destination, Message<?> message) throws MessagingException;
+    void send(String destination, Message<?> message) throws MessagingException;
 
     /**
      * Send message thar create from incoming payload for all subscribers by method (destination).
      *
      * @param destination   name of subscribe.
      * @param payload       param of notification.
-     * @param postProcessor than handle before convertAndSend and after convert to message.
+     * @param postProcessor than handle before send and after convert to message.
      * @throws MessagingException if fail to send message.
      * @see ru.nikityan.easy.rpc.socket.jsonRpc.annotation.Subscribe
      */

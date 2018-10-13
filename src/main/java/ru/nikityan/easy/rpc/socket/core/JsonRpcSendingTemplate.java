@@ -36,12 +36,12 @@ public class JsonRpcSendingTemplate implements MessageSendingOperations {
     }
 
     @Override
-    public void convertAndSend(Message<?> message) throws MessagingException {
+    public void send(Message<?> message) throws MessagingException {
         doSend(message);
     }
 
     @Override
-    public void convertAndSend(String destination, Message<?> message) throws MessagingException {
+    public void send(String destination, Message<?> message) throws MessagingException {
         MessageHeaderAccessor messageHeaderAccessor = MessageHeaderAccessor.ofMessage(message);
         messageHeaderAccessor.setMessageMethod(destination);
         messageHeaderAccessor.setSendMessageMethod(destination);
@@ -77,7 +77,7 @@ public class JsonRpcSendingTemplate implements MessageSendingOperations {
         boolean sent = this.messageChannel.send(message);
         logger.debug("Send message, messageMethod = {}, message = {}", messageMethod, message);
         if (!sent) {
-            throw new MessageSendException(message, "Failed to convertAndSend message to destination " + messageMethod);
+            throw new MessageSendException(message, "Failed to send message to destination " + messageMethod);
         }
     }
 
@@ -85,7 +85,7 @@ public class JsonRpcSendingTemplate implements MessageSendingOperations {
                                   @Nullable MessagingPostProcessor postProcessor) {
         MessageHeaders messageHeaders = new MessageHeaders(headers, MessageType.NOTIFICATION, -1L);
         Message<?> message = doConvert(destination, payload, messageHeaders, postProcessor);
-        convertAndSend(destination, message);
+        send(destination, message);
     }
 
     protected Message<?> doConvert(String destination, Object payload, MessageHeaders messageHeaders,
