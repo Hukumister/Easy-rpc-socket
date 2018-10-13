@@ -16,7 +16,8 @@ import ru.nikityan.easy.rpc.socket.support.MessageHeaderAccessor;
 import java.util.Map;
 
 /**
- * Created by Nikit on 30.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class JsonRpcSendingTemplate implements MessageSendingOperations {
 
@@ -24,7 +25,7 @@ public class JsonRpcSendingTemplate implements MessageSendingOperations {
 
     private final MessageChannel messageChannel;
 
-    private final MessageConverter messageConverter = new JsonRpcMessageConverter();
+    private final SmartMessageConverter messageConverter = new JsonRpcMessageConverter();
 
     public JsonRpcSendingTemplate(MessageChannel messageChannel) {
         this.messageChannel = messageChannel;
@@ -35,14 +36,15 @@ public class JsonRpcSendingTemplate implements MessageSendingOperations {
     }
 
     @Override
-    public void send(Message<?> message) throws MessagingException {
+    public void convertAndSend(Message<?> message) throws MessagingException {
         doSend(message);
     }
 
     @Override
-    public void send(String destination, Message<?> message) throws MessagingException {
+    public void convertAndSend(String destination, Message<?> message) throws MessagingException {
         MessageHeaderAccessor messageHeaderAccessor = MessageHeaderAccessor.ofMessage(message);
         messageHeaderAccessor.setMessageMethod(destination);
+        messageHeaderAccessor.setSendMessageMethod(destination);
         MessageHeaders messageHeaders = messageHeaderAccessor.getMessageHeaders();
         messageHeaderAccessor.setImmutable();
         Message<?> sendMessage = MessageBuilder.fromMessage(message)
@@ -57,7 +59,7 @@ public class JsonRpcSendingTemplate implements MessageSendingOperations {
     }
 
     @Override
-    public void send(String destination, Object payload, MessagingPostProcessor postProcessor) throws MessagingException {
+    public void convertAndSend(String destination, Object payload, MessagingPostProcessor postProcessor) throws MessagingException {
         convertAndSend(destination, payload, null, postProcessor);
     }
 
@@ -75,20 +77,20 @@ public class JsonRpcSendingTemplate implements MessageSendingOperations {
         boolean sent = this.messageChannel.send(message);
         logger.debug("Send message, messageMethod = {}, message = {}", messageMethod, message);
         if (!sent) {
-            throw new MessageSendException(message, "Failed to send message to destination " + messageMethod);
+            throw new MessageSendException(message, "Failed to convertAndSend message to destination " + messageMethod);
         }
     }
 
     protected void convertAndSend(String destination, Object payload, @Nullable Map<String, Object> headers,
                                   @Nullable MessagingPostProcessor postProcessor) {
         MessageHeaders messageHeaders = new MessageHeaders(headers, MessageType.NOTIFICATION, -1L);
-        Message<?> message = doConvert(payload, messageHeaders, postProcessor);
-        send(destination, message);
+        Message<?> message = doConvert(destination, payload, messageHeaders, postProcessor);
+        convertAndSend(destination, message);
     }
 
-    protected Message<?> doConvert(Object payload, MessageHeaders messageHeaders,
+    protected Message<?> doConvert(String destination, Object payload, MessageHeaders messageHeaders,
                                    @Nullable MessagingPostProcessor postProcessor) {
-        Message<?> message = messageConverter.toMessage(payload, messageHeaders);
+        Message<?> message = messageConverter.toMessage(payload, messageHeaders, destination);
         if (postProcessor != null) {
             postProcessor.postProcessMessage(message);
         }
