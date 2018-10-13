@@ -2,6 +2,7 @@ package ru.nikityan.easy.rpc.socket.core;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.util.StringUtils;
@@ -13,7 +14,8 @@ import ru.nikityan.easy.rpc.socket.jsonRpc.JsonRpcRequest;
 import ru.nikityan.easy.rpc.socket.support.MessageBuilder;
 
 /**
- * Created by Nikit on 01.10.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class JsonRpcIncomingConverter implements MessageConverter {
 
@@ -34,11 +36,19 @@ public class JsonRpcIncomingConverter implements MessageConverter {
         }
         JsonRpcRequest jsonRpcRequest = null;
         try {
+            validJson(incoming);
             jsonRpcRequest = gson.fromJson(incoming, JsonRpcRequest.class);
             validRequest(jsonRpcRequest);
             return MessageBuilder.fromPayload(jsonRpcRequest).build();
         } catch (JsonSyntaxException ex) {
             throw new JsonRequestException(ex, JsonRpcError.parseError(), jsonRpcRequest);
+        }
+    }
+
+    private void validJson(String incoming) {
+        JsonObject jsonObject = gson.fromJson(incoming, JsonObject.class);
+        if(!jsonObject.isJsonObject()){
+            throw new JsonRequestException(JsonRpcError.badRequest(), null);
         }
     }
 
