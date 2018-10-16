@@ -21,7 +21,7 @@ different ways depending on the container used.
 
 Example for jetty:
 
-    ``` java
+    ```java
     @Configuration
     @EnableWebSocket
     @EnableEasySocketRpc
@@ -49,8 +49,7 @@ Example for jetty:
             policy.setIdleTimeout(120_000);
             return new DefaultHandshakeHandler(new JettyRequestUpgradeStrategy(new WebSocketServerFactory(context, policy)));
         }
-    }
-    ```
+    }```
 
 ## Getting Started
 
