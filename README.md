@@ -6,8 +6,8 @@ https://www.jsonrpc.org/specification), the websocket protocol is used as a tran
 The library works in the spring framework ecosystem. 
 To use the library, you must enable sping dependencies for working with a websocket.
 ```gradle
-    compile "org.springframework:spring-websocket:$springVersion"
-    compile "org.springframework:spring-context-support:$springVersion"
+compile "org.springframework:spring-websocket:$springVersion"
+compile "org.springframework:spring-context-support:$springVersion"
 ```
 Where `$springVersion ` set spring version 4.3.+
 
