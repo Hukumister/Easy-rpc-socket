@@ -5,10 +5,10 @@ https://www.jsonrpc.org/specification), the websocket protocol is used as a tran
 ## Installing
 The library works in the spring framework ecosystem. 
 To use the library, you must enable sping dependencies for working with a websocket.
-
+```gradle
     compile "org.springframework:spring-websocket:$springVersion"
     compile "org.springframework:spring-context-support:$springVersion"
-
+```
 Where `$springVersion ` set spring version 4.3.+
 
 Then you need to create a configuration file, which implements the WebSocketConfigurer interface. In this configuration 
@@ -20,42 +20,42 @@ TransportWebSocketHandler bean as the handle. It is also necessary to configure 
 different ways depending on the container used.
 
 Example for jetty:
-
-    ```java
-    @Configuration
-    @EnableWebSocket
-    @EnableEasySocketRpc
-    public class WebSocketConfig implements WebSocketConfigurer {
+     
+```java
+@Configuration
+@EnableWebSocket
+@EnableEasySocketRpc
+public class WebSocketConfig implements WebSocketConfigurer {
+    private final ServletContext context;
+    private final TransportWebSocketHandler handler;
  
-        private final ServletContext context;
-        private final TransportWebSocketHandler handler;
+    @Autowired
+    public WebSocketConfig(ServletContext context, TransportWebSocketHandler handler) {
+        this.context = context;
+        this.handler = handler;
+    }
  
-        @Autowired
-        public WebSocketConfig(ServletContext context, TransportWebSocketHandler handler) {
-            this.context = context;
-            this.handler = handler;
-        }
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(handler, "/jsonRpcHandler")
+                .setHandshakeHandler(handshakeHandler())
+                .setAllowedOrigins("*");
+    }
  
-        @Override
-        public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-            registry.addHandler(handler, "/jsonRpcHandler")
-                    .setHandshakeHandler(handshakeHandler())
-                    .setAllowedOrigins("*");
-        }
- 
-        @Bean
-        public DefaultHandshakeHandler handshakeHandler() {
-            WebSocketPolicy policy = new WebSocketPolicy(WebSocketBehavior.SERVER);
-            policy.setIdleTimeout(120_000);
-            return new DefaultHandshakeHandler(new JettyRequestUpgradeStrategy(new WebSocketServerFactory(context, policy)));
-        }
-    }```
+    @Bean
+    public DefaultHandshakeHandler handshakeHandler() {
+        WebSocketPolicy policy = new WebSocketPolicy(WebSocketBehavior.SERVER);
+        policy.setIdleTimeout(120_000);
+        return new DefaultHandshakeHandler(new JettyRequestUpgradeStrategy(new WebSocketServerFactory(context, policy)));
+    }
+}
+```
 
 ## Getting Started
 
 After the library is connected, the controller may be created.
 Example:
-
+```java
     @JsonRpcController
     public class HelloWorld {
 
@@ -71,31 +71,30 @@ Example:
             return "ok";
         }
     }
-
+```
 Sample request model:
-
-    {
-        "id":123,
-        "method":"helloWorld", 
-        "params":{
-            "id":123
-        }
+```json
+{
+    "id":123,
+    "method":"helloWorld", 
+    "params":{
+        "id":123
     }
-     
+}
+```     
 Response Model
-
-   
-    {
-   	    "id":123,
-   	    "result":"HelloWorld", 
-   	    "error":null
-    }
-   
+```json
+{
+    "id":123,
+    "result":"HelloWorld", 
+    "error":null
+}
+```    
 Also your can return another object.
 
 Example:  
  
-        ``` java       
+```java       
          private class Answer {
             private final long id;
             private final String title;
@@ -122,26 +121,26 @@ Example:
                 return new Answer(idNumber, "testTitle");
             }
         }
-        ```
+```
         
 Response Model
-
-    {
-        "id":123,
-        "result":{
-            "id":123, 
-            "title":"testTitle"
-        },
-        "error":null
-    }       
-        
+```json
+{
+    "id":123,
+    "result":{
+        "id":123, 
+        "title":"testTitle"
+    },
+    "error":null
+}       
+```        
 Further, methods are divided into two types: method, as it is, and subscription. The method operates on the principle 
 of query-response. The subscription works in the similar way as the method does, except that the client’s session is 
 memorized, by means of that you can send notifications to all clients, who subscribe to this method, using the 
 `MessageSendingOperations` bean.
 
 Example of using MessageSendingOperations:
-
+```java 
     @Controller
      public class HelloWorld {
     
@@ -162,40 +161,40 @@ Example of using MessageSendingOperations:
             return "ok";
         }
     }
-      
+```      
 
 Request model:
-
-    {
-        "id":45,
-        "method":"subscribe", 
-        "params":{
-           "name":"Test"
-        }
+```json
+{
+    "id":45,
+    "method":"subscribe", 
+    "params":{
+        "name":"Test"
     }
-  
+}
+```
 Response model:
-
-    {
-   	    "id":45,
-   	    "error":null
-   	    "result":"ok", 
-    }
-   
+```json
+{
+    "id":45,
+    "error":null,
+    "result":"ok", 
+}
+ ```  
 Notification model:   
-    
-    {
-        "method":"subscribe",
-        "params":"ok"
-    }
-    
+ ```json   
+{
+    "method":"subscribe",
+    "params":"ok"
+}
+  ```    
 In addition, it is possible to catch exceptions in a method by marking the method with the ExceptionHandler annotation 
 and passing to the annotation the type
 of the exception being caught. If there are no methods in the controller marked with the ExceptionHandler annotation, 
 then a standard error will be sent to the client (error model).
 
 Example:
-    
+```java    
     @Controller
     public class HelloWorld {
     
@@ -217,19 +216,19 @@ Example:
         }
     
     }
-    
+```    
 Response model:
-
-    {
-   	    "id":45,
-   	    "error":null
-   	    "result":"Exception", 
-    }    
-
+ ```json  
+{
+    "id":45,
+    "error":null,
+    "result":"Exception", 
+}    
+```
 If you want return error object throw exception or return JsonRpcError object.
 
 Example:
-
+```java
     @Controller
     public class HelloWorld {
         
@@ -238,20 +237,20 @@ Example:
             return new JsonRpcError(-32001, "custom error");
         }
     }
-
+```
 
 
 Response model:
-
-    {
-        "id":123,
-        "result":null, 
-        "error":{
-            "code":-32001,
-            "message":"custom error"
-        }
+ ```json  
+{
+    "id":123,
+    "result":null, 
+    "error":{
+        "code":-32001,
+        "message":"custom error"
     }
-
+}
+```
 
 ## Authors
 
