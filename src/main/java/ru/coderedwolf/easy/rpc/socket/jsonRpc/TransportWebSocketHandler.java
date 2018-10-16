@@ -12,11 +12,10 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 import ru.coderedwolf.easy.rpc.socket.*;
-import ru.coderedwolf.easy.rpc.socket.exceptions.MessagingException;
-import ru.nikityan.easy.rpc.socket.*;
 import ru.coderedwolf.easy.rpc.socket.core.JsonRpcIncomingConverter;
 import ru.coderedwolf.easy.rpc.socket.core.MessageConverter;
 import ru.coderedwolf.easy.rpc.socket.exceptions.JsonRequestException;
+import ru.coderedwolf.easy.rpc.socket.exceptions.MessagingException;
 import ru.coderedwolf.easy.rpc.socket.support.MessageBuilder;
 import ru.coderedwolf.easy.rpc.socket.support.MessageHeaderAccessor;
 

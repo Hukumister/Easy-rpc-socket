@@ -14,9 +14,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.context.support.StaticApplicationContext;
 import ru.coderedwolf.easy.rpc.socket.Message;
 import ru.coderedwolf.easy.rpc.socket.MessageChannel;
-import ru.coderedwolf.easy.rpc.socket.jsonRpc.annotation.*;
 import ru.coderedwolf.easy.rpc.socket.SubscribeMessageChanel;
-import ru.nikityan.easy.rpc.socket.jsonRpc.annotation.*;
+import ru.coderedwolf.easy.rpc.socket.jsonRpc.annotation.*;
 import ru.coderedwolf.easy.rpc.socket.support.MessageBuilder;
 
 import java.util.Arrays;
@@ -257,6 +256,47 @@ public class JsonRpcAnnotationMessageHandlerTest {
         assertEquals(payload.getError(), JsonRpcError.internalError());
     }
 
+    @Test
+    public void ifExceptionHandlerThrowExUseDefaultHandler() throws Exception {
+        JsonRpcRequest jsonRpcRequest = new JsonRpcRequest(4, "twiceError", null);
+        Message<JsonRpcRequest> requestMessage = MessageBuilder
+                .fromPayload(jsonRpcRequest)
+                .build();
+
+        messageHandler.registerHandler(testController);
+        messageHandler.handleMessage(requestMessage);
+        ArgumentCaptor<Message> argumentCaptor = ArgumentCaptor.forClass(Message.class);
+
+        assertEquals(testController.method, "IllegalStateException");
+        verify(messageChannel).send(argumentCaptor.capture());
+        Message message = argumentCaptor.getValue();
+        JsonRpcResponse payload = (JsonRpcResponse) message.getPayload();
+
+        assertEquals(payload.getError(), JsonRpcError.internalError());
+    }
+
+
+    @Test
+    public void ifMethodReturnJsonRpcErrorObjectReturnResponseWithError() throws Exception {
+        JsonRpcRequest jsonRpcRequest = new JsonRpcRequest(4, "returnJsonRpcError", null);
+        Message<JsonRpcRequest> requestMessage = MessageBuilder
+                .fromPayload(jsonRpcRequest)
+                .build();
+
+        messageHandler.registerHandler(testController);
+        messageHandler.handleMessage(requestMessage);
+        ArgumentCaptor<Message> argumentCaptor = ArgumentCaptor.forClass(Message.class);
+
+        assertEquals(testController.method, "returnJsonRpcError");
+
+        verify(messageChannel).send(argumentCaptor.capture());
+        Message message = argumentCaptor.getValue();
+        JsonRpcResponse payload = (JsonRpcResponse) message.getPayload();
+
+        assertEquals(payload.getError().getCode(), 1);
+        assertEquals(payload.getError().getMessage(), "message");
+    }
+
     private static class TestJsonRpcAnnotationMessageHandler extends JsonRpcAnnotationMessageHandler {
 
         public TestJsonRpcAnnotationMessageHandler(@NotNull SubscribeMessageChanel inboundChannel,
@@ -340,6 +380,23 @@ public class JsonRpcAnnotationMessageHandlerTest {
             method = "exceptionIllegalArgumentHandler";
             arguments.put("ex", ex);
             return new Answer(ex.getLocalizedMessage(), -1);
+        }
+
+        @RequestMethod("twiceError")
+        public void twiceThrowError() {
+            throw new IllegalStateException();
+        }
+
+        @ExceptionHandler(IllegalStateException.class)
+        public void handleIllegalStateEx() throws Exception {
+            method = "IllegalStateException";
+            throw new Exception();
+        }
+
+        @RequestMethod("returnJsonRpcError")
+        public JsonRpcError returnJsonRpcError() {
+            method = "returnJsonRpcError";
+            return new JsonRpcError(1, "message");
         }
     }
 

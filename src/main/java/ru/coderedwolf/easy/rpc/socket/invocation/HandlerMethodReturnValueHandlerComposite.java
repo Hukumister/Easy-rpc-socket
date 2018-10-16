@@ -9,7 +9,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by Nikit on 11.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class HandlerMethodReturnValueHandlerComposite implements HandlerMethodReturnValueHandler {
 

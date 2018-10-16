@@ -6,12 +6,14 @@ import org.springframework.util.Assert;
 import ru.coderedwolf.easy.rpc.socket.Message;
 import ru.coderedwolf.easy.rpc.socket.MessageHeaders;
 import ru.coderedwolf.easy.rpc.socket.core.MessageSendingOperations;
+import ru.coderedwolf.easy.rpc.socket.jsonRpc.JsonRpcError;
 import ru.coderedwolf.easy.rpc.socket.jsonRpc.JsonRpcResponse;
 import ru.coderedwolf.easy.rpc.socket.jsonRpc.annotation.ExceptionHandler;
 import ru.coderedwolf.easy.rpc.socket.support.MessageBuilder;
 
 /**
- * Created by Nikit on 30.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class ExceptionMethodReturnValueHandler implements HandlerMethodReturnValueHandler {
 
@@ -31,7 +33,12 @@ public class ExceptionMethodReturnValueHandler implements HandlerMethodReturnVal
                                   Message<?> message) throws Exception {
         Assert.notNull(returnType, "Method parameter is required");
         MessageHeaders messageHeader = message.getMessageHeader();
-        JsonRpcResponse rpcResponse = new JsonRpcResponse(messageHeader.getId(), returnValue);
+        JsonRpcResponse rpcResponse;
+        if (returnValue instanceof JsonRpcError) {
+            rpcResponse = new JsonRpcResponse(messageHeader.getId(), (JsonRpcError) returnValue);
+        } else {
+            rpcResponse = new JsonRpcResponse(messageHeader.getId(), returnValue);
+        }
         Message<JsonRpcResponse> responseMessage = MessageBuilder.fromPayload(rpcResponse)
                 .withHeaders(messageHeader)
                 .build();

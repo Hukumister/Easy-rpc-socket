@@ -14,9 +14,9 @@ import org.springframework.util.ClassUtils;
 import ru.coderedwolf.easy.rpc.socket.Message;
 import ru.coderedwolf.easy.rpc.socket.MessageHandler;
 import ru.coderedwolf.easy.rpc.socket.exceptions.MessagingException;
-import ru.coderedwolf.easy.rpc.socket.handler.InvocableHandlerMethod;
 import ru.coderedwolf.easy.rpc.socket.handler.AbstractExceptionHandlerMethodResolver;
 import ru.coderedwolf.easy.rpc.socket.handler.HandlerMethod;
+import ru.coderedwolf.easy.rpc.socket.handler.InvocableHandlerMethod;
 import ru.coderedwolf.easy.rpc.socket.handler.resolvers.ArgumentResolver;
 import ru.coderedwolf.easy.rpc.socket.handler.resolvers.ArgumentResolverComposite;
 import ru.coderedwolf.easy.rpc.socket.invocation.HandlerMethodReturnValueHandler;
@@ -204,7 +204,8 @@ public abstract class AbstractMessageHandler implements MessageHandler, Applicat
             MethodParameter returnType = invocable.getReturnType();
             this.returnValueHandlers.handleReturnValue(returnValue, returnType, message);
         } catch (Throwable throwable) {
-            logger.error("Error while processing handler method exception", throwable);
+            logger.debug("Error while processing handler method exception", throwable);
+            handleDefaultError(exception, message);
         }
     }
 

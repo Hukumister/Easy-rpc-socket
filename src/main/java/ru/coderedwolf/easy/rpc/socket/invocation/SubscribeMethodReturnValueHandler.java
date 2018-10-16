@@ -11,7 +11,8 @@ import ru.coderedwolf.easy.rpc.socket.support.MessageBuilder;
 import ru.coderedwolf.easy.rpc.socket.support.MessageHeaderAccessor;
 
 /**
- * Created by Nikit on 30.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class SubscribeMethodReturnValueHandler implements HandlerMethodReturnValueHandler {
 

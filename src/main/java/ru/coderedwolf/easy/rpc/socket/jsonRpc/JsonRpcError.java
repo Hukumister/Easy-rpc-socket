@@ -16,25 +16,16 @@ public class JsonRpcError {
      */
     private final String message;
 
-    /**
-     * @return
-     */
     @NotNull
     public static JsonRpcError parseError() {
         return new JsonRpcError(-32700, "Parse error");
     }
 
-    /**
-     * @return
-     */
     @NotNull
     public static JsonRpcError badRequest() {
         return new JsonRpcError(-32600, "Invalid Request");
     }
 
-    /**
-     * @return
-     */
     @NotNull
     public static JsonRpcError methodNotFound() {
         return new JsonRpcError(-32601, "Method not found");

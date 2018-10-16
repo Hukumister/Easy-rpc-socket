@@ -6,13 +6,15 @@ import org.springframework.util.Assert;
 import ru.coderedwolf.easy.rpc.socket.Message;
 import ru.coderedwolf.easy.rpc.socket.MessageHeaders;
 import ru.coderedwolf.easy.rpc.socket.core.MessageSendingOperations;
+import ru.coderedwolf.easy.rpc.socket.jsonRpc.JsonRpcError;
 import ru.coderedwolf.easy.rpc.socket.jsonRpc.JsonRpcResponse;
 import ru.coderedwolf.easy.rpc.socket.jsonRpc.annotation.RequestMethod;
 import ru.coderedwolf.easy.rpc.socket.support.MessageBuilder;
 import ru.coderedwolf.easy.rpc.socket.support.MessageHeaderAccessor;
 
 /**
- * Created by Nikit on 30.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public class ResponseMethodReturnValueHandler implements HandlerMethodReturnValueHandler {
 
@@ -36,7 +38,12 @@ public class ResponseMethodReturnValueHandler implements HandlerMethodReturnValu
         RequestMethod annotation = returnType.getMethodAnnotation(RequestMethod.class);
         accessor.setMessageMethod(annotation.value());
         messageHeader = accessor.getMessageHeaders();
-        JsonRpcResponse rpcResponse = new JsonRpcResponse(messageHeader.getId(), returnValue);
+        JsonRpcResponse rpcResponse;
+        if (returnValue instanceof JsonRpcError) {
+            rpcResponse = new JsonRpcResponse(messageHeader.getId(), (JsonRpcError) returnValue);
+        } else {
+            rpcResponse = new JsonRpcResponse(messageHeader.getId(), returnValue);
+        }
         Message<JsonRpcResponse> responseMessage = MessageBuilder.fromPayload(rpcResponse)
                 .withHeaders(messageHeader)
                 .build();

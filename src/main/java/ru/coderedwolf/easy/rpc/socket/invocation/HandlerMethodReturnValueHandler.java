@@ -5,7 +5,8 @@ import org.springframework.core.MethodParameter;
 import ru.coderedwolf.easy.rpc.socket.Message;
 
 /**
- * Created by Nikit on 11.09.2018.
+ * @author CodeRedWolf
+ * @since 1.0
  */
 public interface HandlerMethodReturnValueHandler {
 
