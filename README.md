@@ -183,8 +183,8 @@ Response model:
 Notification model:   
     
     {
-    	"method":"subscribe",
-    	"params":"ok"
+        "method":"subscribe",
+        "params":"ok"
     }
     
 In addition, it is possible to catch exceptions in a method by marking the method with the ExceptionHandler annotation 
@@ -245,8 +245,8 @@ Response model:
         "id":123,
         "result":null, 
         "error":{
-            	"code":-32001,
-        	    "message":"custom error"
+            "code":-32001,
+            "message":"custom error"
         }
     }
 
