@@ -127,8 +127,8 @@ Response Model
     {
         "id":123,
         "result":{
-    	        "id":123, 
-    	        "title":"testTitle"
+            "id":123, 
+            "title":"testTitle"
         },
         "error":null
     }       
