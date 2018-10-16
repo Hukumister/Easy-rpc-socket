@@ -21,6 +21,7 @@ different ways depending on the container used.
 
 Example for jetty:
 
+    ``` java
     @Configuration
     @EnableWebSocket
     @EnableEasySocketRpc
@@ -49,7 +50,7 @@ Example for jetty:
             return new DefaultHandshakeHandler(new JettyRequestUpgradeStrategy(new WebSocketServerFactory(context, policy)));
         }
     }
-
+    ```
 
 ## Getting Started
 
@@ -78,7 +79,7 @@ Sample request model:
         "id":123,
         "method":"helloWorld", 
         "params":{
-     	    "id":123
+            "id":123
         }
     }
      
@@ -93,9 +94,10 @@ Response Model
    
 Also your can return another object.
 
-Example:   
-        
-        private class Answer {
+Example:  
+ 
+        ``` java       
+         private class Answer {
             private final long id;
             private final String title;
     
@@ -121,6 +123,7 @@ Example:
                 return new Answer(idNumber, "testTitle");
             }
         }
+        ```
         
 Response Model
 
