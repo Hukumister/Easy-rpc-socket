@@ -56,21 +56,21 @@ public class WebSocketConfig implements WebSocketConfigurer {
 After the library is connected, the controller may be created.
 Example:
 ```java
-    @JsonRpcController
-    public class HelloWorld {
+@JsonRpcController
+public class HelloWorld {
 
-        @RequestMethod("helloWorld")
-        public String helloWorld(@Param("id") Long idNumber) {
-            System.out.println(idNumber);
-            return "HelloWorld";
-        }
-
-        @Subscribe("subscribe")
-        public String subscribe(@Param("name") String str) {
-            System.out.println(str);
-            return "ok";
-        }
+    @RequestMethod("helloWorld")
+    public String helloWorld(@Param("id") Long idNumber) {
+        System.out.println(idNumber);
+        return "HelloWorld";
     }
+
+    @Subscribe("subscribe")
+    public String subscribe(@Param("name") String str) {
+        System.out.println(str);
+        return "ok";
+    }
+}
 ```
 Sample request model:
 ```json
@@ -95,32 +95,32 @@ Also your can return another object.
 Example:  
  
 ```java       
-         private class Answer {
-            private final long id;
-            private final String title;
+private class Answer {
+    private final long id;
+    private final String title;
     
-            public Answer(long id, String title) {
-                this.id = id;
-                this.title = title;
-            }
+    public Answer(long id, String title) {
+        this.id = id;
+        this.title = title;
+    }
     
-            public long getId() {
-                return id;
-            }
+    public long getId() {
+        return id;
+    }
     
-            public String getTitle() {
-                return title;
-            }
-        }
+    public String getTitle() {
+        return title;
+    }
+}
         
-        @Controller
-        public class HelloWorld {
+@Controller
+public class HelloWorld {
             
-            @RequestMethod("helloWorld")
-            public Answer helloWorld(@Param("id") Long idNumber) {
-                return new Answer(idNumber, "testTitle");
-            }
-        }
+    @RequestMethod("helloWorld")
+    public Answer helloWorld(@Param("id") Long idNumber) {
+        return new Answer(idNumber, "testTitle");
+    }
+}
 ```
         
 Response Model
@@ -141,26 +141,26 @@ memorized, by means of that you can send notifications to all clients, who subsc
 
 Example of using MessageSendingOperations:
 ```java 
-    @Controller
-     public class HelloWorld {
+@Controller
+public class HelloWorld {
     
-        private final MessageSendingOperations sendingOperations;
+    private final MessageSendingOperations sendingOperations;
     
-        public HelloWorld(MessageSendingOperations sendingOperations) {
-            this.sendingOperations = sendingOperations;
-        }
-    
-        @Scheduled(fixedDelay = 2000)
-        public void schedule() {
-            sendingOperations.convertAndSend("subscribe", "ok");
-        }
-    
-        @Subscribe("subscribe")
-        public String subscribe(@Param("name") String str) {
-            System.out.println(str);
-            return "ok";
-        }
+    public HelloWorld(MessageSendingOperations sendingOperations) {
+        this.sendingOperations = sendingOperations;
     }
+    
+    @Scheduled(fixedDelay = 2000)
+    public void schedule() {
+        sendingOperations.convertAndSend("subscribe", "ok");
+    }
+    
+    @Subscribe("subscribe")
+    public String subscribe(@Param("name") String str) {
+        System.out.println(str);
+        return "ok";
+    }
+}
 ```      
 
 Request model:
@@ -195,27 +195,27 @@ then a standard error will be sent to the client (error model).
 
 Example:
 ```java    
-    @Controller
-    public class HelloWorld {
+@Controller
+public class HelloWorld {
     
-        @ExceptionHandler(Exception.class)
-        public String handleException() {
-            System.out.println("Exception");
-            return "Exception";
-        }
-    
-        @ExceptionHandler(IllegalStateException.class)
-        public String handle() {
-            System.out.println("IllegalStateException");
-            return "IllegalStateException";
-        }
-    
-        @RequestMethod("helloWorld")
-        public String helloWorld(@Param("id") Long idNumber) throws Exception {
-            throw new Exception("error");
-        }
-    
+    @ExceptionHandler(Exception.class)
+    public String handleException() {
+        System.out.println("Exception");
+        return "Exception";
     }
+    
+    @ExceptionHandler(IllegalStateException.class)
+    public String handle() {
+        System.out.println("IllegalStateException");
+        return "IllegalStateException";
+    }
+    
+    @RequestMethod("helloWorld")
+    public String helloWorld(@Param("id") Long idNumber) throws Exception {
+        throw new Exception("error");
+    }
+    
+}
 ```    
 Response model:
  ```json  
@@ -229,14 +229,14 @@ If you want return error object throw exception or return JsonRpcError object.
 
 Example:
 ```java
-    @Controller
-    public class HelloWorld {
+@Controller
+public class HelloWorld {
         
-        @ExceptionHandler(IllegalStateException.class)
-        public JsonRpcError handle() {
-            return new JsonRpcError(-32001, "custom error");
-        }
+    @ExceptionHandler(IllegalStateException.class)
+    public JsonRpcError handle() {
+        return new JsonRpcError(-32001, "custom error");
     }
+}
 ```
 
 
