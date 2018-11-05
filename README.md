@@ -134,6 +134,48 @@ Response Model
     "error":null
 }       
 ```        
+And your can use object as input parameter.
+
+```java
+private class Person {
+    private final long id;
+    private final String name;
+    
+    public Answer(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    
+    public long getId() {
+        return id;
+    }
+    
+    public String getName() {
+        return name;
+    }
+}
+        
+@Controller
+public class HelloWorld {
+            
+    @RequestMethod("hello")
+    public void hello(@Param Person person) {
+        System.out.print(person);
+    }
+}
+```
+Sample request model:
+```json
+{
+    "id":123,
+    "method":"helloWorld", 
+    "params":{
+        "id":123,
+        "age":21, 
+        "name":"Bob"
+    }
+}
+```  
 Further, methods are divided into two types: method, as it is, and subscription. The method operates on the principle 
 of query-response. The subscription works in the similar way as the method does, except that the client’s session is 
 memorized, by means of that you can send notifications to all clients, who subscribe to this method, using the 
@@ -178,7 +220,7 @@ Response model:
 {
     "id":45,
     "error":null,
-    "result":"ok", 
+    "result":"ok"
 }
  ```  
 Notification model:   
